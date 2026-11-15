@@ -1,8 +1,7 @@
 // =========================================================================
 // CẤU HÌNH DÀNH CHO GITHUB PAGES (TÙY CHỌN)
-// Nếu bạn muốn mọi người truy cập link GitHub Pages đều tự động vào chung
-// 1 Bảng xếp hạng & Phòng STEM mà không cần mở bảng Cài đặt, hãy dán
-// các thông số Firebase của bạn vào object dưới đây:
+// Dán thông số Firebase của bạn vào đây nếu muốn mọi người vào link GitHub
+// đều tự động kết nối chung 1 Bảng xếp hạng & Phòng STEM:
 // =========================================================================
 const GITHUB_FIREBASE_CONFIG = {
   apiKey: "",
@@ -14,7 +13,23 @@ const GITHUB_FIREBASE_CONFIG = {
 };
 
 // =========================================================================
-// 1. BỘ KIỂM TRA DỮ LIỆU, BÓC TÁCH FIREBASE CONFIG & TRỘN ĐỀ
+// 1. ĐỊNH MỨC KINH TẾ NHIÊN LIỆU BAY (FUEL ECONOMY CONSTANTS)
+// =========================================================================
+const FUEL_RULES = {
+  STARTER_FUEL: 20,
+  RING_ENTRY_COST: { 1: 0, 2: 15, 3: 30 },
+  RING_FIRST_CLEAR_REWARD: { 1: 20, 2: 25, 3: 40 },
+  RING_PRACTICE_REWARD: 10,
+  MYSTERY_BOX_REWARD: 15,
+  ARENA_PER_CORRECT: 2,
+  STEM_PROJECT_REWARD: 30,
+  LIBRARY_DOC_REWARD: 10,
+  LIFELINE_5050_COST: 10,
+  LIFELINE_TIME_COST: 5,
+};
+
+// =========================================================================
+// 2. BỘ KIỂM TRA DỮ LIỆU, BÓC TÁCH FIREBASE CONFIG & TRỘN ĐỀ
 // =========================================================================
 const Validator = {
   sanitizeText(str) {
@@ -44,7 +59,6 @@ const Validator = {
     });
   },
 
-  // Tự động đọc được cả JSON chuẩn lẫn đoạn code JS copy trực tiếp từ Firebase Console
   parseFirebaseConfig(rawInput) {
     if (!rawInput || typeof rawInput !== 'string') return null;
     const trimmed = rawInput.trim();
@@ -54,7 +68,6 @@ const Validator = {
       const parsed = JSON.parse(trimmed);
       if (parsed && parsed.apiKey && parsed.projectId) return parsed;
     } catch (_) {
-      // Nếu người dùng dán nguyên đoạn const firebaseConfig = { apiKey: "..." }
       const keys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
       const extracted = {};
       keys.forEach((k) => {
@@ -135,15 +148,13 @@ const Validator = {
 };
 
 // =========================================================================
-// 2. ĐỘNG CƠ SINH CÂU HỎI ĐỘNG (PROCEDURAL STEM GENERATOR)
-// Mỗi lần làm bài sẽ tự sinh số liệu mới & tự giải theo công thức thật
+// 3. ĐỘNG CƠ SINH CÂU HỎI ĐỘNG (PROCEDURAL STEM GENERATOR)
 // =========================================================================
 const DynamicQuestionGenerator = {
   randInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   },
 
-  // Sinh câu hỏi động cho từng hành tinh và vòng quỹ đạo
   generateForPlanetTier(planetId, tier) {
     if (planetId === 'mercury') {
       if (tier === 1) {
@@ -253,7 +264,7 @@ const DynamicQuestionGenerator = {
 };
 
 // =========================================================================
-// 3. DỮ LIỆU 5 HÀNH TINH & NGÂN HÀNG CÂU HỎI NỀN TẢNG
+// 4. DỮ LIỆU 5 HÀNH TINH & NGÂN HÀNG CÂU HỎI NỀN TẢNG
 // =========================================================================
 const PLANETS_DATA = [
   {
@@ -267,7 +278,7 @@ const PLANETS_DATA = [
     ],
     tiers: [
       {
-        tier: 1, name: 'Vòng 1: Vệ Tinh — Hệ Nhị Phân & Dữ Liệu', xpReward: 40, fuelReward: 15,
+        tier: 1, name: 'Vòng 1: Vệ Tinh — Hệ Nhị Phân & Dữ Liệu', xpReward: 40, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[1], entryCost: FUEL_RULES.RING_ENTRY_COST[1],
         brief: 'Nắm vững cách biểu diễn số nguyên sang hệ nhị phân và đơn vị đo lường thông tin (Bit, Byte).',
         questions: [
           { q: '1 Byte tiêu chuẩn bao gồm bao nhiêu bit?', options: ['4 bit', '8 bit', '16 bit', '32 bit'], answer: 1, topic: 'Hệ nhị phân & Biểu diễn số', explain: '1 Byte chuẩn gồm 8 bit, biểu diễn được 2⁸ = 256 trạng thái.' },
@@ -275,7 +286,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 2, name: 'Vòng 2: Bề Mặt — Thuật Toán & Tìm Kiếm', xpReward: 60, fuelReward: 20,
+        tier: 2, name: 'Vòng 2: Bề Mặt — Thuật Toán & Tìm Kiếm', xpReward: 60, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[2], entryCost: FUEL_RULES.RING_ENTRY_COST[2],
         brief: 'Phân tích hiệu năng thuật toán tìm kiếm và sắp xếp trên tập dữ liệu lớn.',
         questions: [
           { q: 'Điều kiện bắt buộc để áp dụng thuật toán Tìm kiếm nhị phân (Binary Search) là gì?', options: ['Mảng chỉ chứa số nguyên dương', 'Mảng đã được sắp xếp theo thứ tự', 'Số phần tử là lũy thừa của 2', 'Mảng không có số âm'], answer: 1, topic: 'Thuật toán tìm kiếm & Big-O', explain: 'Binary Search chia đôi khoảng tìm kiếm nên bắt buộc mảng phải được sắp xếp trước.' },
@@ -283,7 +294,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Mạch Logic & Bảo Mật', xpReward: 90, fuelReward: 30,
+        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Mạch Logic & Bảo Mật', xpReward: 90, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[3], entryCost: FUEL_RULES.RING_ENTRY_COST[3],
         brief: 'Vận dụng đại số Boole và nguyên tắc an toàn dữ liệu trong hệ thống mạng.',
         questions: [
           { q: 'Cho đầu vào A = 1, B = 1. Đầu ra của biểu thức NOT(A XOR B) là gì?', options: ['0', '1', 'Không xác định', '2'], answer: 1, topic: 'Cổng logic & Đại số Boole', explain: '1 XOR 1 = 0, sau đó NOT(0) = 1.' },
@@ -304,7 +315,7 @@ const PLANETS_DATA = [
     ],
     tiers: [
       {
-        tier: 1, name: 'Vòng 1: Vệ Tinh — Hàm Số Bậc Hai', xpReward: 40, fuelReward: 15,
+        tier: 1, name: 'Vòng 1: Vệ Tinh — Hàm Số Bậc Hai', xpReward: 40, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[1], entryCost: FUEL_RULES.RING_ENTRY_COST[1],
         brief: 'Xác định tọa độ đỉnh, trục đối xứng và điều kiện nghiệm của parabol.',
         questions: [
           { q: 'Phương trình x² - 6x + m = 0 có hai nghiệm thực phân biệt khi và chỉ khi:', options: ['m < 9', 'm > 9', 'm ≤ 9', 'm < 36'], answer: 0, topic: 'Hàm số bậc hai & Cực trị', explain: "Ta có Δ' = 9 - m > 0 ⇔ m < 9." },
@@ -312,7 +323,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 2, name: 'Vòng 2: Bề Mặt — Tổ Hợp & Xác Suất', xpReward: 60, fuelReward: 20,
+        tier: 2, name: 'Vòng 2: Bề Mặt — Tổ Hợp & Xác Suất', xpReward: 60, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[2], entryCost: FUEL_RULES.RING_ENTRY_COST[2],
         brief: 'Tính toán xác suất biến cố và bài toán đếm tổ hợp ứng dụng.',
         questions: [
           { q: 'Gieo đồng thời hai con xúc xắc cân đối. Xác suất để tổng số chấm trên hai mặt bằng 7 là:', options: ['1/6', '1/12', '5/36', '7/36'], answer: 0, topic: 'Tổ hợp & Xác suất', explain: 'Có 6 cặp tổng bằng 7 trên tổng số 36 kết quả đồng khả năng ⇒ 6/36 = 1/6.' },
@@ -320,7 +331,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Tối Ưu Hóa Bằng Đạo Hàm', xpReward: 90, fuelReward: 30,
+        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Tối Ưu Hóa Bằng Đạo Hàm', xpReward: 90, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[3], entryCost: FUEL_RULES.RING_ENTRY_COST[3],
         brief: 'Giải quyết bài toán tối ưu diện tích và chi phí bằng công cụ giải tích.',
         questions: [
           { q: 'Đạo hàm của hàm số f(x) = x³ - 3x² + 4 tại điểm x = 1 bằng:', options: ['-3', '0', '3', '2'], answer: 0, topic: 'Đạo hàm & Bài toán tối ưu', explain: "f'(x) = 3x² - 6x ⇒ f'(1) = 3 - 6 = -3." },
@@ -340,7 +351,7 @@ const PLANETS_DATA = [
     ],
     tiers: [
       {
-        tier: 1, name: 'Vòng 1: Vệ Tinh — Cơ Học & Năng Lượng', xpReward: 40, fuelReward: 15,
+        tier: 1, name: 'Vòng 1: Vệ Tinh — Cơ Học & Năng Lượng', xpReward: 40, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[1], entryCost: FUEL_RULES.RING_ENTRY_COST[1],
         brief: 'Phân tích chuyển động rơi tự do và bảo toàn cơ năng trong trường trọng lực.',
         questions: [
           { q: 'Khi một vật được ném thẳng đứng lên cao (bỏ qua sức cản không khí), đại lượng nào sau đây không đổi?', options: ['Động năng', 'Thế năng trọng trường', 'Cơ năng toàn phần', 'Vận tốc'], answer: 2, topic: 'Động học & Bảo toàn cơ năng', explain: 'Trong trọng trường không ma sát, cơ năng toàn phần luôn được bảo toàn.' },
@@ -348,7 +359,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 2, name: 'Vòng 2: Bề Mặt — Hóa Học & Tốc Độ Phản Ứng', xpReward: 60, fuelReward: 20,
+        tier: 2, name: 'Vòng 2: Bề Mặt — Hóa Học & Tốc Độ Phản Ứng', xpReward: 60, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[2], entryCost: FUEL_RULES.RING_ENTRY_COST[2],
         brief: 'Xác định chất oxi hóa – khử và các yếu tố ảnh hưởng cân bằng hóa học.',
         questions: [
           { q: 'Trong phản ứng: Fe + CuSO₄ → FeSO₄ + Cu, kim loại sắt (Fe) đóng vai trò là gì?', options: ['Chất oxi hóa', 'Chất khử', 'Chất xúc tác', 'Môi trường phản ứng'], answer: 1, topic: 'Phản ứng oxi hóa - khử', explain: 'Fe nhường 2e (số oxi hóa tăng từ 0 lên +2) nên đóng vai trò là chất khử.' },
@@ -357,7 +368,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Di Truyền Học Phân Tử', xpReward: 90, fuelReward: 30,
+        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Di Truyền Học Phân Tử', xpReward: 90, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[3], entryCost: FUEL_RULES.RING_ENTRY_COST[3],
         brief: 'Giải mã cơ chế nhân đôi ADN, phiên mã và dòng năng lượng sinh thái.',
         questions: [
           { q: 'Một đoạn mạch gốc của gen có trình tự 3’-TAX-GGA-5’. Trình tự mARN được phiên mã từ đoạn này là:', options: ['5’-AUG-XXU-3’', '5’-ATG-CCT-3’', '3’-AUG-XXU-5’', '5’-UAC-GGA-3’'], answer: 0, topic: 'Di truyền phân tử & ADN', explain: 'Theo nguyên tắc bổ sung A-U, T-A, G-X, X-G: 3’-TAX-GGA-5’ phiên mã thành 5’-AUG-XXU-3’.' },
@@ -377,7 +388,7 @@ const PLANETS_DATA = [
     ],
     tiers: [
       {
-        tier: 1, name: 'Vòng 1: Vệ Tinh — Tư Duy Lập Luận & Tiếng Việt', xpReward: 40, fuelReward: 15,
+        tier: 1, name: 'Vòng 1: Vệ Tinh — Tư Duy Lập Luận & Tiếng Việt', xpReward: 40, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[1], entryCost: FUEL_RULES.RING_ENTRY_COST[1],
         brief: 'Nhận diện lỗi ngữ pháp và thao tác lập luận trong văn bản nghị luận.',
         questions: [
           { q: 'Trong đoạn văn nghị luận, thao tác nào dùng để chia tách đối tượng nhằm làm sáng tỏ bản chất và nguyên nhân?', options: ['Thao tác phân tích', 'Thao tác bác bỏ', 'Thao tác so sánh', 'Thao tác bình luận'], answer: 0, topic: 'Tư duy nghị luận & Tiếng Việt', explain: 'Phân tích là chia nhỏ đối tượng thành các yếu tố để đi sâu xem xét bản chất.' },
@@ -386,7 +397,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 2, name: 'Vòng 2: Bề Mặt — Ngữ Pháp Tiếng Anh Học Thuật', xpReward: 60, fuelReward: 20,
+        tier: 2, name: 'Vòng 2: Bề Mặt — Ngữ Pháp Tiếng Anh Học Thuật', xpReward: 60, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[2], entryCost: FUEL_RULES.RING_ENTRY_COST[2],
         brief: 'Làm chủ câu điều kiện, mệnh đề quan hệ và cấu trúc bị động khoa học.',
         questions: [
           { q: 'Chọn phương án đúng: "If the spacecraft ______ sufficient fuel, it would enter the outer orbit right now."', options: ['has', 'had', 'had had', 'will have'], answer: 1, topic: 'Ngữ pháp tiếng Anh học thuật', explain: 'Câu điều kiện loại 2 giả định trái với hiện tại ("right now") nên dùng quá khứ đơn (had).' },
@@ -395,7 +406,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Đọc Hiểu Khoa Học Tiếng Anh', xpReward: 90, fuelReward: 30,
+        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Đọc Hiểu Khoa Học Tiếng Anh', xpReward: 90, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[3], entryCost: FUEL_RULES.RING_ENTRY_COST[3],
         brief: 'Đọc phân tích thuật ngữ chuyên ngành STEM và suy luận ý chính từ ngữ cảnh.',
         questions: [
           { q: 'Trong câu: "Unlike fossil fuels, solar energy is a renewable resource that mitigates carbon emissions." Từ "mitigates" gần nghĩa nhất với:', options: ['accelerates', 'reduces', 'generates', 'ignores'], answer: 1, topic: 'Đọc hiểu STEM tiếng Anh', explain: '"Mitigate" nghĩa là làm giảm nhẹ tác động tiêu cực (gần nghĩa nhất với reduce).' },
@@ -416,7 +427,7 @@ const PLANETS_DATA = [
     ],
     tiers: [
       {
-        tier: 1, name: 'Vòng 1: Vệ Tinh — Các Cuộc Cách Mạng Công Nghiệp', xpReward: 40, fuelReward: 15,
+        tier: 1, name: 'Vòng 1: Vệ Tinh — Các Cuộc Cách Mạng Công Nghiệp', xpReward: 40, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[1], entryCost: FUEL_RULES.RING_ENTRY_COST[1],
         brief: 'Hệ thống hóa đặc trưng cốt lõi của 4 cuộc cách mạng kỹ thuật nhân loại.',
         questions: [
           { q: 'Phát minh nào đóng vai trò biểu tượng khởi đầu cho Cách mạng Công nghiệp lần thứ nhất cuối thế kỷ XVIII?', options: ['Động cơ hơi nước của James Watt', 'Động cơ đốt trong chạy xăng', 'Máy tính điện tử ENIAC', 'Mạng Internet toàn cầu WWW'], answer: 0, topic: 'Lịch sử Cách mạng Công nghiệp', explain: 'Máy hơi nước của James Watt cơ khí hóa sản xuất, mở đầu CMCN 1.0.' },
@@ -425,7 +436,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 2, name: 'Vòng 2: Bề Mặt — Lịch Sử Việt Nam & Tư Duy Sử Liệu', xpReward: 60, fuelReward: 20,
+        tier: 2, name: 'Vòng 2: Bề Mặt — Lịch Sử Việt Nam & Tư Duy Sử Liệu', xpReward: 60, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[2], entryCost: FUEL_RULES.RING_ENTRY_COST[2],
         brief: 'Nắm vững các bước ngoặt lịch sử dân tộc và kỹ năng đánh giá sử liệu.',
         questions: [
           { q: 'Thắng lợi quân sự nào năm 1954 đã giáng đòn quyết định, buộc thực dân Pháp phải ký Hiệp định Giơ-ne-vơ?', options: ['Chiến dịch Việt Bắc 1947', 'Chiến dịch Biên giới 1950', 'Chiến dịch Điện Biên Phủ 1954', 'Chiến dịch Hồ Chí Minh 1975'], answer: 2, topic: 'Lịch sử Việt Nam hiện đại', explain: 'Chiến thắng Điện Biên Phủ (7/5/1954) đập tan kế hoạch Nava, dẫn tới Hiệp định Giơ-ne-vơ.' },
@@ -434,7 +445,7 @@ const PLANETS_DATA = [
         ],
       },
       {
-        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Lịch Sử Chinh Phục Vũ Trụ', xpReward: 90, fuelReward: 30,
+        tier: 3, name: 'Vòng 3: Lõi Năng Lượng — Lịch Sử Chinh Phục Vũ Trụ', xpReward: 90, fuelReward: FUEL_RULES.RING_FIRST_CLEAR_REWARD[3], entryCost: FUEL_RULES.RING_ENTRY_COST[3],
         brief: 'Khám phá những cột mốc đưa con người vượt khỏi bầu khí quyển Trái Đất.',
         questions: [
           { q: 'Vệ tinh nhân tạo đầu tiên của loài người được phóng lên quỹ đạo năm 1957 có tên là gì?', options: ['Explorer 1', 'Sputnik 1', 'Vostok 1', 'Voyager 1'], answer: 1, topic: 'Lịch sử khoa học vũ trụ', explain: 'Sputnik 1 được Liên Xô phóng ngày 4/10/1957 là vệ tinh nhân tạo đầu tiên của nhân loại.' },
@@ -506,7 +517,7 @@ const BADGES_DEF = [
 ];
 
 // =========================================================================
-// 4. QUẢN LÝ TRẠNG THÁI THẬT 100% (KHÔNG DÙNG DỮ LIỆU ẢO PEER_LEADERBOARD)
+// 5. QUẢN LÝ TRẠNG THÁI THẬT & ĐỒNG BỘ FIREBASE / LOCAL
 // =========================================================================
 const LOCAL_ACCOUNTS_KEY = 'eduniverse_v4_accounts_db';
 const LOCAL_ACTIVE_USER_KEY = 'eduniverse_v4_active_user';
@@ -521,7 +532,8 @@ function createFreshProfile(userName) {
     userId: accountId,
     userName: cleanName,
     xp: 0,
-    fuel: 0,
+    fuel: FUEL_RULES.STARTER_FUEL, // Khởi tạo 20 L nhiên liệu nền
+    starterFuelGranted: true,
     planetProgress: { mercury: 1, mars: 1, earth: 1, saturn: 1, jupiter: 1 },
     weakTopics: [],
     badges: [],
@@ -540,11 +552,11 @@ const state = {
   orbitSpeedMultiplier: 1,
   orbitTick: 0,
 
-  // Dữ liệu thực của người dùng đang đăng nhập (Khởi đầu từ 0 XP, 0/15 vòng)
   userId: 'user_duc_bao',
   userName: 'Đức Bảo',
   xp: 0,
-  fuel: 0,
+  fuel: FUEL_RULES.STARTER_FUEL,
+  starterFuelGranted: true,
   planetProgress: { mercury: 1, mars: 1, earth: 1, saturn: 1, jupiter: 1 },
   weakTopics: [],
   badges: [],
@@ -553,7 +565,6 @@ const state = {
   dailyResult: null,
   arenaBestScore: 0,
 
-  // Danh sách dữ liệu thực (Đồng bộ Firestore hoặc Local DB)
   libraryDocs: [...INITIAL_LIBRARY_DOCS],
   stemProjects: [],
   leaderboardUsers: [],
@@ -601,10 +612,17 @@ function switchOrCreateLocalAccount(targetName, notify = true) {
   }
 
   const acc = localAccountsDb[key];
+  // Tự động cấp 20 L khởi hành cho tài khoản cũ chưa từng nhận
+  if (!acc.starterFuelGranted && (acc.xp || 0) === 0 && (acc.fuel || 0) === 0) {
+    acc.fuel = FUEL_RULES.STARTER_FUEL;
+    acc.starterFuelGranted = true;
+  }
+
   state.userId = acc.userId;
   state.userName = acc.userName;
-  state.xp = acc.xp ?? 0;
-  state.fuel = acc.fuel ?? 0;
+  state.xp = Math.max(0, Number(acc.xp) || 0);
+  state.fuel = Math.max(0, Number(acc.fuel) || 0);
+  state.starterFuelGranted = true;
   state.planetProgress = { mercury: 1, mars: 1, earth: 1, saturn: 1, jupiter: 1, ...(acc.planetProgress || {}) };
   state.weakTopics = Array.isArray(acc.weakTopics) ? acc.weakTopics : [];
   state.badges = Array.isArray(acc.badges) ? acc.badges : [];
@@ -616,7 +634,7 @@ function switchOrCreateLocalAccount(targetName, notify = true) {
   localStorage.setItem(LOCAL_ACTIVE_USER_KEY, state.userName);
   saveToLocalStorage();
   if (notify) {
-    showToast('ĐÃ CHUYỂN HỒ SƠ', `Đang sử dụng tài khoản "${state.userName}" (${state.xp} XP).`, 'info');
+    showToast('ĐÃ CHUYỂN HỒ SƠ', `Tài khoản "${state.userName}" (${state.xp} XP | ${state.fuel} L).`, 'info');
   }
 }
 
@@ -628,8 +646,9 @@ function saveToLocalStorage() {
     localAccountsDb[key] = {
       userId: state.userId,
       userName: state.userName,
-      xp: state.xp,
-      fuel: state.fuel,
+      xp: Math.max(0, state.xp),
+      fuel: Math.max(0, state.fuel),
+      starterFuelGranted: true,
       rings: totalRings,
       planetProgress: state.planetProgress,
       weakTopics: state.weakTopics,
@@ -704,14 +723,13 @@ async function initFirebaseConnection() {
 
       updateSyncStatus(true, `Cloud: ${firebaseConfig.projectId}`);
 
-      // 1. Đồng bộ hồ sơ người dùng từ Firestore
       const profileRef = sdk.doc(db, 'eduniverse_users', user.uid);
       const snap = await sdk.getDoc(profileRef);
       if (snap.exists()) {
         const d = snap.data();
         if (d.userName && !user.displayName) state.userName = d.userName;
-        state.xp = Math.max(state.xp, d.xp ?? 0);
-        state.fuel = Math.max(state.fuel, d.fuel ?? 0);
+        state.xp = Math.max(0, d.xp ?? state.xp);
+        state.fuel = Math.max(0, d.fuel ?? state.fuel);
         if (d.planetProgress) {
           Object.keys(state.planetProgress).forEach((k) => {
             state.planetProgress[k] = Math.max(state.planetProgress[k] || 1, d.planetProgress[k] || 1);
@@ -726,7 +744,6 @@ async function initFirebaseConnection() {
         await persistUserProfile();
       }
 
-      // 2. Đồng bộ Bảng xếp hạng thật 100% từ Firestore (Không có dữ liệu ảo)
       const lbCol = sdk.collection(db, 'eduniverse_leaderboard');
       sdk.onSnapshot(lbCol, (snapshot) => {
         const realCloudUsers = [];
@@ -746,7 +763,6 @@ async function initFirebaseConnection() {
         renderDiagnosticsAndLeaderboard();
       }, () => {});
 
-      // 3. Đồng bộ Dự án STEM thật từ Firestore (Hỗ trợ vote & xóa thật)
       const projCol = sdk.collection(db, 'eduniverse_projects');
       sdk.onSnapshot(projCol, (snapshot) => {
         const cloudProjects = [];
@@ -759,7 +775,6 @@ async function initFirebaseConnection() {
         renderStemProjects();
       }, () => {});
 
-      // 4. Đồng bộ Thư viện số thật từ Firestore
       const libCol = sdk.collection(db, 'eduniverse_library');
       sdk.onSnapshot(libCol, (snapshot) => {
         const cloudDocs = [];
@@ -826,7 +841,7 @@ async function persistUserProfile() {
 }
 
 // =========================================================================
-// 5. TIỆN ÍCH THÔNG BÁO TOAST & TIẾN ĐỘ
+// 6. HÀM CỘNG / TRỪ NHIÊN LIỆU & KIỂM TRA SỐ DƯ AN TOÀN
 // =========================================================================
 function showToast(title, message, type = 'info') {
   const container = document.getElementById('toast-container');
@@ -851,15 +866,43 @@ function getAstronautRank(xp) {
 
 function canAccessTier(planetId, tier) { return tier <= (state.planetProgress[planetId] || 1); }
 function isTierCompleted(planetId, tier) { return (state.planetProgress[planetId] || 1) > tier; }
+
+// Tính phí nhiên liệu bay vào Vòng quỹ đạo: Vòng đã chinh phục thì miễn phí (0 L) để ôn tập
+function getTierEntryFuelCost(planetId, tier) {
+  if (isTierCompleted(planetId, tier)) return 0;
+  return FUEL_RULES.RING_ENTRY_COST[tier] || 0;
+}
+
 function addWeakTopic(topic) { if (topic && !state.weakTopics.includes(topic)) state.weakTopics.push(topic); }
 function removeWeakTopic(topic) { state.weakTopics = state.weakTopics.filter((t) => t !== topic); }
 
 function awardRewards(xpGain, fuelGain) {
-  state.xp += xpGain;
-  state.fuel += fuelGain;
+  state.xp = Math.max(0, state.xp + (Number(xpGain) || 0));
+  state.fuel = Math.max(0, state.fuel + (Number(fuelGain) || 0));
   evaluateBadges();
   persistUserProfile();
   updateTopTelemetry();
+}
+
+// Hàm trừ nhiên liệu an toàn (Không bao giờ cho phép âm nhiên liệu)
+function spendFuel(amount, reasonLabel = '') {
+  const cost = Number(amount) || 0;
+  if (cost <= 0) return true;
+  if (state.fuel < cost) {
+    showToast(
+      'KHÔNG ĐỦ NHIÊN LIỆU BAY',
+      `Cần ${cost} L nhưng bạn chỉ còn ${state.fuel} L. Hãy làm Vòng 1, mở Hộp thư bí mật (+15 L) hoặc thi Đấu trường để nạp thêm!`,
+      'error'
+    );
+    return false;
+  }
+  state.fuel = Math.max(0, state.fuel - cost);
+  persistUserProfile();
+  updateTopTelemetry();
+  if (reasonLabel) {
+    showToast('ĐÃ TIÊU HAO NHIÊN LIỆU', `-${cost} L (${reasonLabel}). Còn lại: ${state.fuel} L.`, 'amber');
+  }
+  return true;
 }
 
 function evaluateBadges() {
@@ -885,7 +928,7 @@ function updateTopTelemetry() {
 }
 
 // =========================================================================
-// 6. CHUYỂN PHÂN KHU & BẢN ĐỒ HỆ MẶT TRỜI XOAY SVG
+// 7. CHUYỂN PHÂN KHU & BẢN ĐỒ HỆ MẶT TRỜI XOAY SVG
 // =========================================================================
 window.switchModule = function (moduleKey) {
   state.activeModule = moduleKey;
@@ -1045,23 +1088,34 @@ function renderPlanetInspector() {
     body.innerHTML = `<div class="space-y-3.5">${planet.tiers.map((t) => {
       const unlocked = canAccessTier(planet.id, t.tier);
       const done = isTierCompleted(planet.id, t.tier);
+      const entryCost = getTierEntryFuelCost(planet.id, t.tier);
+      const hasEnoughFuel = state.fuel >= entryCost;
+
       const statusBadge = done
         ? '<span class="font-mono-num text-[10px] font-bold px-2.5 py-0.5 bg-emeraldLock/15 border border-emeraldLock/50 text-emeraldLock rounded-full">ĐÃ CHINH PHỤC</span>'
         : unlocked
-        ? '<span class="font-mono-num text-[10px] font-bold px-2.5 py-0.5 bg-cyanRadar/15 border border-cyanRadar/50 text-cyanRadar rounded-full">SẴN SÀNG</span>'
+        ? `<span class="font-mono-num text-[10px] font-bold px-2.5 py-0.5 ${hasEnoughFuel ? 'bg-cyanRadar/15 border-cyanRadar/50 text-cyanRadar' : 'bg-amberSolar/15 border-amberSolar/50 text-amberSolar'} border rounded-full">${entryCost > 0 ? `PHÍ BAY: -${entryCost} L` : 'MIỄN PHÍ BAY (0 L)'}</span>`
         : '<span class="font-mono-num text-[10px] font-bold px-2.5 py-0.5 bg-crimsonSignal/15 border border-crimsonSignal/40 text-crimsonSignal rounded-full">ĐANG KHÓA</span>';
+
+      let btnLabel = 'Cần vượt vòng trước';
+      if (unlocked) {
+        if (done) btnLabel = 'Ôn tập lại (0 L • Thưởng +10 L)';
+        else if (!hasEnoughFuel) btnLabel = `Thiếu nhiên liệu (Cần ${entryCost} L)`;
+        else btnLabel = entryCost > 0 ? `Phóng tàu khảo sát (-${entryCost} L)` : 'Bắt đầu khảo sát (0 L)';
+      }
+
       return `
         <div class="p-4 border ${done ? 'border-emeraldLock/40 bg-void/90' : unlocked ? 'border-[rgba(226,232,240,0.22)] bg-void' : 'border-[rgba(226,232,240,0.08)] bg-void/40 opacity-70'} rounded-2xl relative">
           <div class="flex items-center justify-between gap-2">
-            <span class="font-mono-num text-[11px] text-slateMuted">VÒNG 0${t.tier} • +${t.xpReward} XP | +${t.fuelReward} L</span>
+            <span class="font-mono-num text-[11px] text-slateMuted">VÒNG 0${t.tier} • Thưởng: +${t.xpReward} XP | +${t.fuelReward} L</span>
             ${statusBadge}
           </div>
           <h4 class="text-sm font-bold text-white mt-1.5">${t.name}</h4>
           <p class="text-xs text-slateMuted mt-1 leading-relaxed">${t.brief}</p>
-          <div class="mt-3.5 flex items-center justify-between">
-            <span class="font-mono-num text-[11px] text-slateMuted">Yêu cầu đạt: ≥ 70% (Đề trộn động)</span>
-            <button type="button" onclick="window.launchTierQuiz('${planet.id}', ${t.tier})" ${!unlocked ? 'disabled' : ''} class="font-mono-num text-xs px-3.5 py-2 rounded-xl transition-colors ${!unlocked ? 'bg-surface border border-[rgba(226,232,240,0.1)] text-slateMuted cursor-not-allowed' : done ? 'border border-emeraldLock/50 text-emeraldLock hover:bg-emeraldLock/10 font-semibold' : 'bg-cyanRadar text-void font-bold'}">
-              ${!unlocked ? 'Cần vượt vòng trước' : done ? 'Luyện tập lại (Sinh số mới)' : 'Bắt đầu khảo sát'}
+          <div class="mt-3.5 flex items-center justify-between gap-2">
+            <span class="font-mono-num text-[11px] text-slateMuted">Đạt ≥ 70% để qua vòng</span>
+            <button type="button" onclick="window.launchTierQuiz('${planet.id}', ${t.tier})" ${!unlocked ? 'disabled' : ''} class="font-mono-num text-xs px-3.5 py-2 rounded-xl transition-colors ${!unlocked ? 'bg-surface border border-[rgba(226,232,240,0.1)] text-slateMuted cursor-not-allowed' : done ? 'border border-emeraldLock/50 text-emeraldLock hover:bg-emeraldLock/10 font-semibold' : hasEnoughFuel ? 'bg-cyanRadar text-void font-bold' : 'border border-amberSolar/50 text-amberSolar bg-amberSolar/10 font-semibold'}">
+              ${btnLabel}
             </button>
           </div>
         </div>
@@ -1086,7 +1140,7 @@ function renderPlanetInspector() {
                 <span class="font-mono-num text-[10px] font-bold px-2 py-0.5 border border-amberSolar/40 text-amberSolar rounded-full">${Validator.sanitizeText(d.type)}</span>
                 <div class="flex items-center gap-2">
                   ${d.url ? `<a href="${Validator.sanitizeText(d.url)}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-semibold text-cyanRadar hover:underline">Mở tài liệu ↗</a>` : '<span class="text-[10px] text-slateMuted">Ghi chú nội bộ</span>'}
-                  ${d.authorId === state.userId ? `<button type="button" onclick="window.deleteLibraryDoc('${d.id}')" class="text-[10px] text-crimsonSignal hover:underline">Xóa</button>` : ''}
+                  ${d.authorId === state.userId ? `<button type="button" onclick="window.deleteLibraryDoc('${d.id}')" class="text-[10px] text-crimsonSignal hover:underline">Xóa (-15 XP, -10 L)</button>` : ''}
                 </div>
               </div>
               <h5 class="text-xs font-bold text-white">${Validator.sanitizeText(d.title)}</h5>
@@ -1102,7 +1156,7 @@ function renderPlanetInspector() {
           <p id="err-lib-summary" class="text-[10px] text-crimsonSignal hidden"></p>
           <input id="lib-doc-url" type="url" placeholder="Liên kết https://... (tùy chọn)" class="w-full text-xs" />
           <p id="err-lib-url" class="text-[10px] text-crimsonSignal hidden"></p>
-          <button type="submit" class="w-full text-xs py-2.5 bg-surfaceAlt border border-cyanRadar/50 text-cyanRadar hover:bg-cyanRadar hover:text-void font-bold rounded-xl">Lưu vào Thư viện số (+15 XP)</button>
+          <button type="submit" class="w-full text-xs py-2.5 bg-surfaceAlt border border-cyanRadar/50 text-cyanRadar hover:bg-cyanRadar hover:text-void font-bold rounded-xl">Lưu vào Thư viện số (+15 XP, +${FUEL_RULES.LIBRARY_DOC_REWARD} L)</button>
         </form>
       </div>
     `;
@@ -1130,8 +1184,8 @@ function renderPlanetInspector() {
       };
 
       state.libraryDocs.unshift(newDoc);
-      awardRewards(15, 5);
-      showToast('THƯ VIỆN SỐ', 'Đã lưu và đồng bộ tài liệu mới (+15 XP).', 'success');
+      awardRewards(15, FUEL_RULES.LIBRARY_DOC_REWARD);
+      showToast('THƯ VIỆN SỐ', `Đã lưu tài liệu mới (+15 XP, +${FUEL_RULES.LIBRARY_DOC_REWARD} L).`, 'success');
       renderPlanetInspector();
 
       if (db && currentUser && fbSdk) {
@@ -1144,7 +1198,13 @@ function renderPlanetInspector() {
 }
 
 window.deleteLibraryDoc = async function (docId) {
+  const target = state.libraryDocs.find((d) => d.id === docId);
+  if (!target) return;
   state.libraryDocs = state.libraryDocs.filter((d) => d.id !== docId);
+  // Thu hồi XP và nhiên liệu đã cấp để chống tạo-xóa liên tục cày điểm
+  if (target.authorId === state.userId) {
+    awardRewards(-15, -FUEL_RULES.LIBRARY_DOC_REWARD);
+  }
   saveToLocalStorage();
   renderPlanetInspector();
   if (db && currentUser && fbSdk) {
@@ -1153,11 +1213,11 @@ window.deleteLibraryDoc = async function (docId) {
       await deleteDoc(doc(db, 'eduniverse_library', docId));
     } catch (_) {}
   }
-  showToast('ĐÃ XÓA TÀI LIỆU', 'Tài liệu đã được gỡ khỏi Thư viện số.', 'info');
+  showToast('ĐÃ XÓA TÀI LIỆU', 'Đã gỡ tài liệu và thu hồi phần thưởng đóng góp.', 'info');
 };
 
 // =========================================================================
-// 7. MODAL KIỂM TRA QUỸ ĐẠO (KẾT HỢP CÂU HỎI GỐC + CÂU HỎI SINH ĐỘNG)
+// 8. MODAL KIỂM TRA QUỸ ĐẠO (CÓ THU PHÍ BAY & TRỢ GIÚP 50:50 TRỪ 10 L)
 // =========================================================================
 let activeTierQuiz = null;
 
@@ -1170,11 +1230,25 @@ window.launchTierQuiz = function (planetId, tierNumber) {
   const tierObj = planet?.tiers.find((t) => t.tier === tierNumber);
   if (!planet || !tierObj) return;
 
+  const entryCost = getTierEntryFuelCost(planetId, tierNumber);
+  if (entryCost > 0) {
+    const ok = spendFuel(entryCost, `Phóng tàu vào ${tierObj.name}`);
+    if (!ok) {
+      renderPlanetInspector();
+      return;
+    }
+  }
+
   const basePool = [...tierObj.questions];
   const dynamicQ = DynamicQuestionGenerator.generateForPlanetTier(planetId, tierNumber);
   if (dynamicQ) basePool.push(dynamicQ);
 
-  const shuffledQuestions = Validator.shuffleQuestions(basePool).slice(0, 3);
+  const shuffledQuestions = Validator.shuffleQuestions(basePool).slice(0, 3).map((q) => ({
+    ...q,
+    eliminatedOptions: [],
+    used5050: false
+  }));
+
   activeTierQuiz = {
     planetId,
     tierNumber,
@@ -1188,36 +1262,77 @@ window.launchTierQuiz = function (planetId, tierNumber) {
   document.getElementById('quiz-modal-tag').textContent = `${planet.code} • VÒNG 0${tierNumber}`;
   document.getElementById('quiz-modal-title').textContent = tierObj.name;
   renderQuizModalContent();
+  renderPlanetInspector();
   document.getElementById('quiz-modal').classList.remove('hidden');
+};
+
+window.useQuiz5050 = function (qIdx) {
+  if (!activeTierQuiz || activeTierQuiz.submitted) return;
+  const qItem = activeTierQuiz.questions[qIdx];
+  if (!qItem || qItem.used5050) return;
+
+  if (!spendFuel(FUEL_RULES.LIFELINE_5050_COST, `Trợ giúp 50:50 Câu ${qIdx + 1}`)) return;
+
+  const wrongIndices = qItem.options
+    .map((_, idx) => idx)
+    .filter((idx) => idx !== qItem.answer);
+
+  const toEliminate = Validator.shuffleArray(wrongIndices).slice(0, 2);
+  qItem.eliminatedOptions = toEliminate;
+  qItem.used5050 = true;
+
+  // Nếu người dùng đang chọn đúng vào phương án sai vừa bị gạch bỏ thì xóa lựa chọn đó
+  if (toEliminate.includes(activeTierQuiz.answers[qIdx])) {
+    activeTierQuiz.answers[qIdx] = null;
+  }
+
+  renderQuizModalContent();
 };
 
 function renderQuizModalContent() {
   if (!activeTierQuiz) return;
-  const { questions, answers, submitted } = activeTierQuiz;
+  const { planetId, tierNumber, questions, answers, submitted } = activeTierQuiz;
   const body = document.getElementById('quiz-modal-body');
 
-  let html = `<div class="space-y-4">`;
+  let html = `
+    <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-surface border border-indigo-300/20 rounded-2xl text-xs">
+      <span>Nhiên liệu hiện có: <strong class="font-mono-num text-cyanRadar">${state.fuel} L</strong></span>
+      <span class="text-slateMuted">Quyền trợ giúp: <strong>50:50 (-${FUEL_RULES.LIFELINE_5050_COST} L / câu)</strong></span>
+    </div>
+    <div class="space-y-4">
+  `;
+
   questions.forEach((item, qIdx) => {
+    const can5050 = !submitted && !item.used5050 && state.fuel >= FUEL_RULES.LIFELINE_5050_COST;
     html += `
       <div class="p-4 bg-void border border-[rgba(226,232,240,0.16)] rounded-2xl space-y-3">
-        <div class="flex items-center justify-between text-[11px] font-mono-num text-slateMuted">
-          <span>CÂU 0${qIdx + 1}/${questions.length}</span>
-          <span>CHỦ ĐỀ: ${item.topic}</span>
+        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono-num text-slateMuted">
+          <span>CÂU 0${qIdx + 1}/${questions.length} • ${item.topic}</span>
+          ${!submitted ? `
+            <button type="button" onclick="window.useQuiz5050(${qIdx})" ${!can5050 ? 'disabled' : ''} class="px-2.5 py-1 rounded-lg border text-[11px] font-bold ${item.used5050 ? 'border-emeraldLock/40 text-emeraldLock opacity-70 cursor-not-allowed' : can5050 ? 'border-amberSolar/60 text-amberSolar bg-amberSolar/10 hover:bg-amberSolar/20' : 'border-slate-700 text-slateMuted opacity-50 cursor-not-allowed'}">
+              ${item.used5050 ? 'Đã dùng 50:50' : `Trợ giúp 50:50 (-${FUEL_RULES.LIFELINE_5050_COST} L)`}
+            </button>
+          ` : ''}
         </div>
         <p class="text-sm font-semibold text-white leading-relaxed">${item.q}</p>
         <div class="grid grid-cols-1 gap-2">
           ${item.options.map((opt, optIdx) => {
+            const isEliminated = Array.isArray(item.eliminatedOptions) && item.eliminatedOptions.includes(optIdx);
             const isPicked = answers[qIdx] === optIdx;
             const isCorrect = item.answer === optIdx;
+
             let btnClass = 'border-[rgba(226,232,240,0.18)] bg-surface text-offwhite hover:border-cyanRadar';
-            if (submitted) {
+            if (isEliminated && !submitted) {
+              btnClass = 'border-slate-800 bg-void/40 text-slateMuted line-through opacity-35 cursor-not-allowed';
+            } else if (submitted) {
               if (isCorrect) btnClass = 'border-emeraldLock bg-emeraldLock/15 text-emeraldLock font-bold';
               else if (isPicked) btnClass = 'border-crimsonSignal bg-crimsonSignal/15 text-crimsonSignal';
               else btnClass = 'border-[rgba(226,232,240,0.08)] bg-surface/50 text-slateMuted';
             } else if (isPicked) {
               btnClass = 'border-cyanRadar bg-cyanRadar/20 text-cyanRadar font-bold';
             }
-            return `<button type="button" ${submitted ? 'disabled' : ''} onclick="window.selectTierQuizOption(${qIdx}, ${optIdx})" class="text-left text-xs px-3.5 py-2.5 border ${btnClass} rounded-xl transition-colors flex items-center gap-2.5"><span class="font-mono-num text-xs opacity-80">[${String.fromCharCode(65 + optIdx)}]</span><span>${opt}</span></button>`;
+
+            return `<button type="button" ${submitted || isEliminated ? 'disabled' : ''} onclick="window.selectTierQuizOption(${qIdx}, ${optIdx})" class="text-left text-xs px-3.5 py-2.5 border ${btnClass} rounded-xl transition-colors flex items-center gap-2.5"><span class="font-mono-num text-xs opacity-80">[${String.fromCharCode(65 + optIdx)}]</span><span>${opt}</span></button>`;
           }).join('')}
         </div>
         ${submitted && item.explain ? `<div class="text-xs text-cyanRadar bg-surface px-3.5 py-2.5 rounded-xl border-l-4 border-cyanRadar">💡 Giải thích: ${item.explain}</div>` : ''}
@@ -1237,13 +1352,18 @@ function renderQuizModalContent() {
     const correctCount = questions.reduce((acc, q, i) => acc + (answers[i] === q.answer ? 1 : 0), 0);
     const pct = Math.round((correctCount / questions.length) * 100);
     const passed = pct >= 70;
+    const retryCost = getTierEntryFuelCost(planetId, tierNumber);
+    const canRetry = state.fuel >= retryCost;
+
     html += `
       <div class="p-4 border ${passed ? 'border-emeraldLock bg-emeraldLock/10' : 'border-crimsonSignal bg-crimsonSignal/10'} rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div class="font-mono-num text-xs font-extrabold ${passed ? 'text-emeraldLock' : 'text-crimsonSignal'}">KẾT QUẢ: ${correctCount}/${questions.length} CÂU ĐÚNG (${pct}%) — ${passed ? 'ĐẠT CHUẨN MỞ KHÓA' : 'CHƯA ĐẠT (YÊU CẦU ≥ 70%)'}</div>
-          <p class="text-xs text-offwhite mt-1">${passed ? 'Vòng quỹ đạo tiếp theo đã được mở khóa!' : 'Các chủ đề làm sai đã được lưu vào hồ sơ để Gia sư AI hỗ trợ bạn ôn lại.'}</p>
+          <p class="text-xs text-offwhite mt-1">${passed ? 'Trạm quỹ đạo tiếp theo đã được mở khóa!' : 'Các chủ đề làm sai đã được lưu vào hồ sơ để Gia sư AI hỗ trợ bạn ôn lại.'}</p>
         </div>
-        <button type="button" onclick="window.launchTierQuiz('${activeTierQuiz.planetId}', ${activeTierQuiz.tierNumber})" class="text-xs px-4 py-2.5 bg-surfaceAlt border border-cyanRadar text-cyanRadar font-bold rounded-xl shrink-0">Làm đề mới (Sinh số khác)</button>
+        <button type="button" onclick="window.launchTierQuiz('${planetId}', ${tierNumber})" ${!canRetry ? 'disabled' : ''} class="text-xs px-4 py-2.5 ${canRetry ? 'bg-surfaceAlt border border-cyanRadar text-cyanRadar font-bold' : 'bg-surface border border-slate-700 text-slateMuted opacity-60 cursor-not-allowed'} rounded-xl shrink-0">
+          ${retryCost > 0 ? (canRetry ? `Thử lại vòng này (-${retryCost} L)` : `Thiếu nhiên liệu (${state.fuel}/${retryCost} L)`) : 'Luyện lại đề mới (0 L)'}
+        </button>
       </div>
     `;
   }
@@ -1253,6 +1373,8 @@ function renderQuizModalContent() {
 
 window.selectTierQuizOption = function (qIdx, optIdx) {
   if (!activeTierQuiz || activeTierQuiz.submitted) return;
+  const qItem = activeTierQuiz.questions[qIdx];
+  if (qItem?.eliminatedOptions?.includes(optIdx)) return;
   activeTierQuiz.answers[qIdx] = optIdx;
   renderQuizModalContent();
 };
@@ -1273,12 +1395,12 @@ window.submitTierQuiz = function () {
       awardRewards(tierObj.xpReward, tierObj.fuelReward);
       showToast('MỞ KHÓA QUỸ ĐẠO', `Hoàn thành ${tierObj.name} (+${tierObj.xpReward} XP, +${tierObj.fuelReward} L).`, 'success');
     } else {
-      awardRewards(10, 5);
-      showToast('ÔN TẬP HOÀN TẤT', 'Củng cố kiến thức thành công (+10 XP).', 'info');
+      awardRewards(10, FUEL_RULES.RING_PRACTICE_REWARD);
+      showToast('ÔN TẬP HOÀN TẤT', `Củng cố kiến thức thành công (+10 XP, +${FUEL_RULES.RING_PRACTICE_REWARD} L).`, 'info');
     }
   } else {
     persistUserProfile();
-    showToast('CHƯA ĐẠT NGƯỠNG 70%', 'Hãy xem lời giải chi tiết bên dưới và thử lại.', 'error');
+    showToast('CHƯA ĐẠT NGƯỠNG 70%', 'Hãy xem lời giải chi tiết bên dưới trước khi thử lại.', 'error');
   }
   renderQuizModalContent();
   updatePlanetPositions();
@@ -1287,7 +1409,7 @@ window.submitTierQuiz = function () {
 };
 
 // =========================================================================
-// 8. HỘP THƯ BÍ MẬT, THỬ THÁCH 5 PHÚT ĐỘNG & ĐẤU TRƯỜNG TRÍ TUỆ
+// 9. HỘP THƯ BÍ MẬT, THỬ THÁCH 5 PHÚT & ĐẤU TRƯỜNG (CÓ 50:50 & +15 GIÂY)
 // =========================================================================
 function getDayIndex(dateStr) {
   const p = dateStr.split('-').map(Number);
@@ -1307,7 +1429,7 @@ function renderMysteryBox() {
   if (state.claimedMysteryDate !== todayStr) {
     container.innerHTML = `
       <div class="p-4 bg-void border border-amberSolar/40 rounded-2xl space-y-3.5">
-        <div class="flex items-center justify-between"><span class="text-xs text-amberSolar font-bold">ĐANG NIÊM PHONG</span><span class="font-mono-num text-[11px] text-slateMuted">Thưởng: +30 XP | +15 L</span></div>
+        <div class="flex items-center justify-between"><span class="text-xs text-amberSolar font-bold">ĐANG NIÊM PHONG</span><span class="font-mono-num text-[11px] text-slateMuted">Thưởng: +30 XP | +${FUEL_RULES.MYSTERY_BOX_REWARD} L</span></div>
         <div class="p-3.5 bg-surface border border-[rgba(226,232,240,0.14)] rounded-xl text-xs text-white leading-relaxed">${capsule.riddle}</div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           ${capsule.options.map((opt, idx) => `<button type="button" onclick="window.solveDailyMystery(${idx})" class="text-left text-xs px-3.5 py-2.5 bg-surface border border-[rgba(226,232,240,0.18)] hover:border-amberSolar text-white rounded-xl">[${String.fromCharCode(65 + idx)}] ${opt}</button>`).join('')}
@@ -1317,7 +1439,7 @@ function renderMysteryBox() {
   } else {
     container.innerHTML = `
       <div class="p-4 bg-void border border-emeraldLock/40 rounded-2xl space-y-3 text-xs">
-        <div class="text-[11px] text-emeraldLock font-bold">✅ ĐÃ MỞ HỘP THƯ HÔM NAY</div>
+        <div class="text-[11px] text-emeraldLock font-bold">✅ ĐÃ MỞ HỘP THƯ HÔM NAY (+30 XP, +${FUEL_RULES.MYSTERY_BOX_REWARD} L)</div>
         <div class="p-3 bg-surface border-l-4 border-cyanRadar text-white leading-relaxed rounded-r-xl"><span class="block text-[10px] text-cyanRadar font-bold mb-0.5">SỰ THẬT KHOA HỌC</span>${capsule.fact}</div>
         <div class="p-3 bg-surface border-l-4 border-amberSolar text-white leading-relaxed rounded-r-xl"><span class="block text-[10px] text-amberSolar font-bold mb-0.5">NHẮC NHỞ CÁ NHÂN HÓA</span>${adaptiveTip}</div>
         <p class="italic text-slateMuted">${capsule.quote}</p>
@@ -1332,15 +1454,15 @@ window.solveDailyMystery = function (pickedIdx) {
   const capsule = MYSTERY_CAPSULES[getDayIndex(todayStr) % MYSTERY_CAPSULES.length];
   if (pickedIdx === capsule.answer) {
     state.claimedMysteryDate = todayStr;
-    awardRewards(30, 15);
-    showToast('MỞ HỘP THÀNH CÔNG', 'Nhận +30 XP và +15 L nhiên liệu.', 'amber');
+    awardRewards(30, FUEL_RULES.MYSTERY_BOX_REWARD);
+    showToast('MỞ HỘP THÀNH CÔNG', `Nhận +30 XP và +${FUEL_RULES.MYSTERY_BOX_REWARD} L nhiên liệu.`, 'amber');
     renderMysteryBox();
   } else {
     showToast('CHƯA ĐÚNG', 'Thử suy luận lại câu đố nhé!', 'error');
   }
 };
 
-let dailySession = { active: false, secondsLeft: 300, intervalId: null, questions: [], answers: [null, null, null, null] };
+let dailySession = { active: false, isPractice: false, secondsLeft: 300, intervalId: null, questions: [], answers: [null, null, null, null] };
 
 function buildDynamicDailyDrill() {
   const qMath = DynamicQuestionGenerator.generateForPlanetTier('mars', 3);
@@ -1371,13 +1493,13 @@ function renderDailyChallenge() {
   const container = document.getElementById('daily-challenge-container');
   const timerEl = document.getElementById('daily-timer-display');
 
-  if (state.completedDailyDate === todayStr && state.dailyResult) {
+  if (state.completedDailyDate === todayStr && state.dailyResult && !dailySession.active) {
     timerEl.textContent = '00:00';
     container.innerHTML = `
       <div class="p-4 bg-void border border-emeraldLock/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div>
           <div class="font-bold text-emeraldLock">ĐÃ HOÀN THÀNH THỬ THÁCH NGÀY ${todayStr}</div>
-          <p class="text-white mt-1">Kết quả: <strong>${state.dailyResult.score}/4 câu đúng</strong> (${state.dailyResult.timeTaken}s) — Nhận <strong class="text-amberSolar">+${state.dailyResult.xpEarned} XP</strong>.</p>
+          <p class="text-white mt-1">Kết quả: <strong>${state.dailyResult.score}/4 câu đúng</strong> (${state.dailyResult.timeTaken}s) — Nhận <strong class="text-amberSolar">+${state.dailyResult.xpEarned} XP</strong> & <strong class="text-cyanRadar">+${state.dailyResult.fuelEarned ?? 0} L</strong>.</p>
         </div>
         <button type="button" onclick="window.practiceDailyAgain()" class="px-3.5 py-2 bg-surfaceAlt border border-cyanRadar/50 text-cyanRadar font-bold rounded-xl shrink-0">Luyện thêm đề mới</button>
       </div>
@@ -1386,7 +1508,7 @@ function renderDailyChallenge() {
   }
   if (!dailySession.active) {
     timerEl.textContent = '05:00';
-    container.innerHTML = `<div class="p-4 bg-void border border-[rgba(226,232,240,0.16)] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div class="space-y-1"><p class="text-sm text-white font-semibold">4 câu hỏi sinh số liệu động: Toán học, Khoa học, Tiếng Anh và Tư duy Logic.</p><p class="text-xs text-slateMuted">Khi đồng hồ về 00:00, hệ thống tự động khóa và chấm bài.</p></div><button type="button" onclick="window.startDailyChallenge()" class="text-xs px-5 py-2.5 bg-cyanRadar font-bold rounded-xl shrink-0">Bắt đầu 05:00</button></div>`;
+    container.innerHTML = `<div class="p-4 bg-void border border-[rgba(226,232,240,0.16)] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div class="space-y-1"><p class="text-sm text-white font-semibold">4 câu hỏi sinh số liệu động: Toán học, Khoa học, Tiếng Anh và Tư duy Logic.</p><p class="text-xs text-slateMuted">Thưởng tối đa +25 L nhiên liệu (tính theo số câu làm đúng). Khi về 00:00 tự động thu bài.</p></div><button type="button" onclick="window.startDailyChallenge(false)" class="text-xs px-5 py-2.5 bg-cyanRadar font-bold rounded-xl shrink-0">Bắt đầu 05:00</button></div>`;
     return;
   }
 
@@ -1403,14 +1525,14 @@ function renderDailyChallenge() {
 }
 
 window.practiceDailyAgain = function () {
-  state.completedDailyDate = null;
-  window.startDailyChallenge();
+  window.startDailyChallenge(true);
 };
 
-window.startDailyChallenge = function () {
+window.startDailyChallenge = function (isPracticeMode = false) {
   if (dailySession.active) return;
   dailySession = {
     active: true,
+    isPractice: Boolean(isPracticeMode),
     secondsLeft: 300,
     questions: buildDynamicDailyDrill(),
     answers: [null, null, null, null],
@@ -1439,16 +1561,32 @@ window.submitDailyChallenge = function (isTimeout) {
     if (dailySession.answers[idx] === item.answer) { score++; removeWeakTopic(item.topic); }
     else addWeakTopic(item.topic);
   });
+
   const timeTaken = 300 - Math.max(0, dailySession.secondsLeft);
-  const xpEarned = score * 25 + 15;
+  // Chống nộp bài 0 điểm để cày nhiên liệu: Đúng 0 câu nhận 0 XP, 0 L
+  let xpEarned = 0;
+  let fuelEarned = 0;
+  if (dailySession.isPractice) {
+    xpEarned = score * 5;
+    fuelEarned = score >= 3 ? 5 : 0;
+  } else {
+    xpEarned = score > 0 ? (score * 25 + 15) : 0;
+    fuelEarned = score > 0 ? (5 + score * 5) : 0; // 4/4 = +25 L, 0/4 = 0 L
+    state.completedDailyDate = todayStr;
+    state.dailyResult = { score, timeTaken, xpEarned, fuelEarned };
+  }
+
   dailySession.active = false;
-  state.completedDailyDate = todayStr;
-  state.dailyResult = { score, timeTaken, xpEarned };
-  awardRewards(xpEarned, 20);
-  showToast(isTimeout ? 'HẾT GIỜ 00:00 — TỰ ĐỘNG THU BÀI' : 'HOÀN THÀNH THỬ THÁCH', `Đạt ${score}/4 câu đúng (+${xpEarned} XP).`, 'success');
+  awardRewards(xpEarned, fuelEarned);
+  showToast(
+    isTimeout ? 'HẾT GIỜ 00:00 — TỰ ĐỘNG THU BÀI' : 'HOÀN THÀNH THỬ THÁCH',
+    `Đạt ${score}/4 câu đúng (+${xpEarned} XP, +${fuelEarned} L).`,
+    score > 0 ? 'success' : 'error'
+  );
   renderDailyChallenge();
 };
 
+// --- Đấu trường trí tuệ 10 câu (Có Trợ giúp 50:50 trừ 10 L & +15 giây trừ 5 L) ---
 let arenaSession = null;
 function buildArenaDeck() {
   const pool = [];
@@ -1459,19 +1597,24 @@ function buildArenaDeck() {
       if (dyn) pool.push(dyn);
     });
   });
-  return Validator.shuffleQuestions(pool).slice(0, 10);
+  return Validator.shuffleQuestions(pool).slice(0, 10).map((q) => ({
+    ...q,
+    eliminatedOptions: [],
+    used5050: false,
+    usedExtraTime: false
+  }));
 }
 
 function renderArenaHome() {
   document.getElementById('arena-best-score').textContent = `${state.arenaBestScore}/10`;
   const ws = document.getElementById('arena-workspace');
   if (arenaSession && arenaSession.active) return;
-  ws.innerHTML = `<div class="p-4 bg-void border border-[rgba(226,232,240,0.16)] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"><p class="text-xs text-white">10 câu hỏi tổng hợp (kết hợp ngân hàng lý thuyết và bài toán sinh số tự động) từ 5 hành tinh (15 giây/câu).</p><button type="button" onclick="window.startArenaBlitz()" class="text-xs px-5 py-2.5 bg-emeraldLock font-bold rounded-xl shrink-0">Vào Đấu Trường</button></div>`;
+  ws.innerHTML = `<div class="p-4 bg-void border border-[rgba(226,232,240,0.16)] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"><p class="text-xs text-white">10 câu hỏi tổng hợp tốc độ cao (15 giây/câu). Thưởng <strong>+${FUEL_RULES.ARENA_PER_CORRECT} L / câu đúng</strong> (Vào cửa miễn phí 0 L, có quyền trợ giúp 50:50 và +15 giây).</p><button type="button" onclick="window.startArenaBlitz()" class="text-xs px-5 py-2.5 bg-emeraldLock font-bold rounded-xl shrink-0">Vào Đấu Trường (0 L)</button></div>`;
 }
 
 window.startArenaBlitz = function () {
   if (arenaSession?.timerId) clearInterval(arenaSession.timerId);
-  arenaSession = { active: true, questions: buildArenaDeck(), index: 0, score: 0, streak: 0, maxStreak: 0, secLeft: 15, locked: false, timerId: null };
+  arenaSession = { active: true, questions: buildArenaDeck(), index: 0, score: 0, streak: 0, maxStreak: 0, secLeft: 15, maxSec: 15, locked: false, timerId: null };
   startArenaTimer();
   renderArenaQuestion();
 };
@@ -1479,28 +1622,73 @@ window.startArenaBlitz = function () {
 function startArenaTimer() {
   if (arenaSession.timerId) clearInterval(arenaSession.timerId);
   arenaSession.secLeft = 15;
+  arenaSession.maxSec = 15;
   arenaSession.locked = false;
   arenaSession.timerId = setInterval(() => {
     if (!arenaSession?.active) return;
     arenaSession.secLeft -= 1;
     const bar = document.getElementById('arena-time-bar');
     const txt = document.getElementById('arena-time-txt');
-    if (bar) bar.style.width = `${Math.max(0, (arenaSession.secLeft / 15) * 100)}%`;
+    if (bar) bar.style.width = `${Math.max(0, Math.min(100, (arenaSession.secLeft / arenaSession.maxSec) * 100))}%`;
     if (txt) txt.textContent = `${arenaSession.secLeft}s`;
     if (arenaSession.secLeft <= 0) window.handleArenaAnswer(-1);
   }, 1000);
 }
 
+window.useArena5050 = function () {
+  if (!arenaSession?.active || arenaSession.locked) return;
+  const qObj = arenaSession.questions[arenaSession.index];
+  if (!qObj || qObj.used5050) return;
+
+  if (!spendFuel(FUEL_RULES.LIFELINE_5050_COST, 'Trợ giúp 50:50 trong Đấu trường')) return;
+
+  const wrongIndices = qObj.options.map((_, i) => i).filter((i) => i !== qObj.answer);
+  qObj.eliminatedOptions = Validator.shuffleArray(wrongIndices).slice(0, 2);
+  qObj.used5050 = true;
+  renderArenaQuestion();
+};
+
+window.useArenaExtraTime = function () {
+  if (!arenaSession?.active || arenaSession.locked) return;
+  const qObj = arenaSession.questions[arenaSession.index];
+  if (!qObj || qObj.usedExtraTime) return;
+
+  if (!spendFuel(FUEL_RULES.LIFELINE_TIME_COST, 'Mua +15 giây trong Đấu trường')) return;
+
+  qObj.usedExtraTime = true;
+  arenaSession.secLeft += 15;
+  arenaSession.maxSec = Math.max(arenaSession.maxSec, arenaSession.secLeft);
+  renderArenaQuestion();
+};
+
 function renderArenaQuestion() {
   const ws = document.getElementById('arena-workspace');
   const qObj = arenaSession.questions[arenaSession.index];
+  const can5050 = !qObj.used5050 && state.fuel >= FUEL_RULES.LIFELINE_5050_COST;
+  const canTime = !qObj.usedExtraTime && state.fuel >= FUEL_RULES.LIFELINE_TIME_COST;
+
   ws.innerHTML = `
     <div class="p-4 bg-void border border-[rgba(226,232,240,0.18)] rounded-2xl space-y-3.5">
-      <div class="flex justify-between font-mono-num text-xs"><span class="text-cyanRadar font-bold">CÂU ${arenaSession.index + 1}/10 • ${qObj.subject}</span><div class="flex gap-3"><span class="text-amberSolar font-bold">Chuỗi đúng: ${arenaSession.streak}</span><span id="arena-time-txt" class="text-white font-bold">${arenaSession.secLeft}s</span></div></div>
-      <div class="w-full h-1.5 bg-surface overflow-hidden rounded-full"><div id="arena-time-bar" class="h-full bg-cyanRadar transition-all duration-300" style="width:${(arenaSession.secLeft / 15) * 100}%"></div></div>
+      <div class="flex flex-wrap items-center justify-between gap-2 font-mono-num text-xs">
+        <span class="text-cyanRadar font-bold">CÂU ${arenaSession.index + 1}/10 • ${qObj.subject}</span>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="window.useArena5050()" ${!can5050 ? 'disabled' : ''} class="px-2.5 py-1 rounded-lg border text-[11px] font-bold ${qObj.used5050 ? 'border-emeraldLock/40 text-emeraldLock opacity-60' : can5050 ? 'border-amberSolar/60 text-amberSolar bg-amberSolar/10' : 'border-slate-700 text-slateMuted opacity-40 cursor-not-allowed'}">
+            ${qObj.used5050 ? 'Đã dùng 50:50' : `50:50 (-${FUEL_RULES.LIFELINE_5050_COST} L)`}
+          </button>
+          <button type="button" onclick="window.useArenaExtraTime()" ${!canTime ? 'disabled' : ''} class="px-2.5 py-1 rounded-lg border text-[11px] font-bold ${qObj.usedExtraTime ? 'border-emeraldLock/40 text-emeraldLock opacity-60' : canTime ? 'border-cyanRadar/60 text-cyanRadar bg-cyanRadar/10' : 'border-slate-700 text-slateMuted opacity-40 cursor-not-allowed'}">
+            ${qObj.usedExtraTime ? 'Đã +15s' : `+15 giây (-${FUEL_RULES.LIFELINE_TIME_COST} L)`}
+          </button>
+          <span class="text-amberSolar font-bold ml-1">Chuỗi: ${arenaSession.streak}</span>
+          <span id="arena-time-txt" class="text-white font-bold">${arenaSession.secLeft}s</span>
+        </div>
+      </div>
+      <div class="w-full h-1.5 bg-surface overflow-hidden rounded-full"><div id="arena-time-bar" class="h-full bg-cyanRadar transition-all duration-300" style="width:${Math.min(100, (arenaSession.secLeft / arenaSession.maxSec) * 100)}%"></div></div>
       <p class="text-sm font-semibold text-white pt-1">${qObj.q}</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        ${qObj.options.map((opt, idx) => `<button type="button" onclick="window.handleArenaAnswer(${idx})" class="text-left text-xs px-3.5 py-2.5 bg-surface border border-[rgba(226,232,240,0.18)] hover:border-cyanRadar text-white rounded-xl"><span class="font-mono-num text-slateMuted mr-1.5">[${String.fromCharCode(65 + idx)}]</span>${opt}</button>`).join('')}
+        ${qObj.options.map((opt, idx) => {
+          const isElim = Array.isArray(qObj.eliminatedOptions) && qObj.eliminatedOptions.includes(idx);
+          return `<button type="button" ${isElim ? 'disabled' : ''} onclick="window.handleArenaAnswer(${idx})" class="text-left text-xs px-3.5 py-2.5 border ${isElim ? 'border-slate-800 bg-void/40 text-slateMuted line-through opacity-35 cursor-not-allowed' : 'bg-surface border-[rgba(226,232,240,0.18)] hover:border-cyanRadar text-white'} rounded-xl"><span class="font-mono-num text-slateMuted mr-1.5">[${String.fromCharCode(65 + idx)}]</span>${opt}</button>`;
+        }).join('')}
       </div>
     </div>
   `;
@@ -1525,10 +1713,12 @@ window.handleArenaAnswer = function (pickedIdx) {
     const { score, maxStreak } = arenaSession;
     arenaSession.active = false;
     const xpEarned = score * 15 + (maxStreak >= 3 ? maxStreak * 5 : 0);
+    // Chỉ thưởng nhiên liệu theo đúng số câu trả lời đúng (+2 L / câu đúng)
+    const fuelEarned = score * FUEL_RULES.ARENA_PER_CORRECT;
     if (score > state.arenaBestScore) state.arenaBestScore = score;
-    awardRewards(xpEarned, Math.max(5, score * 2));
+    awardRewards(xpEarned, fuelEarned);
     document.getElementById('arena-best-score').textContent = `${state.arenaBestScore}/10`;
-    document.getElementById('arena-workspace').innerHTML = `<div class="p-4 bg-void border border-cyanRadar/50 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><div class="text-xs text-cyanRadar font-bold">HOÀN THÀNH ĐẤU TRƯỜNG</div><p class="text-sm text-white mt-0.5">Điểm: <strong>${score}/10</strong> | Chuỗi cực đại: <strong>${maxStreak}</strong> | Thưởng: <strong class="text-amberSolar">+${xpEarned} XP</strong>.</p></div><button type="button" onclick="window.startArenaBlitz()" class="text-xs px-5 py-2.5 bg-cyanRadar font-bold rounded-xl">Thi đấu trận mới</button></div>`;
+    document.getElementById('arena-workspace').innerHTML = `<div class="p-4 bg-void border border-cyanRadar/50 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><div class="text-xs text-cyanRadar font-bold">HOÀN THÀNH ĐẤU TRƯỜNG</div><p class="text-sm text-white mt-0.5">Điểm: <strong>${score}/10</strong> | Chuỗi cực đại: <strong>${maxStreak}</strong> | Thưởng: <strong class="text-amberSolar">+${xpEarned} XP</strong> & <strong class="text-cyanRadar">+${fuelEarned} L</strong>.</p></div><button type="button" onclick="window.startArenaBlitz()" class="text-xs px-5 py-2.5 bg-cyanRadar font-bold rounded-xl">Thi đấu trận mới</button></div>`;
   } else {
     startArenaTimer();
     renderArenaQuestion();
@@ -1536,7 +1726,7 @@ window.handleArenaAnswer = function (pickedIdx) {
 };
 
 // =========================================================================
-// 9. PHÒNG LAB STEM 3 CHẾ ĐỘ & DỰ ÁN STEM ĐỒNG BỘ THẬT (VOTE / XÓA THẬT)
+// 10. PHÒNG LAB STEM 3 CHẾ ĐỘ & DỰ ÁN STEM ĐỒNG BỘ THẬT
 // =========================================================================
 const simState = {
   mode: 'projectile',
@@ -1956,7 +2146,7 @@ function initStemBoard() {
     };
 
     state.stemProjects.unshift(newProject);
-    awardRewards(40, 20);
+    awardRewards(40, FUEL_RULES.STEM_PROJECT_REWARD);
     renderStemProjects();
 
     form.reset();
@@ -1966,7 +2156,7 @@ function initStemBoard() {
     fieldBindings.forEach(({ inputId }) => {
       document.getElementById(inputId).classList.remove('border-emeraldLock', 'border-crimsonSignal');
     });
-    showToast('ĐĂNG TẢI THÀNH CÔNG', `Dự án "${newProject.title}" đã được lưu (+40 XP).`, 'success');
+    showToast('ĐĂNG TẢI THÀNH CÔNG', `Dự án "${newProject.title}" đã được lưu (+40 XP, +${FUEL_RULES.STEM_PROJECT_REWARD} L).`, 'success');
 
     if (db && currentUser && fbSdk) {
       try {
@@ -1984,7 +2174,7 @@ function renderStemProjects() {
   const listEl = document.getElementById('stem-projects-list');
   const filtered = filterCat === 'ALL' ? state.stemProjects : state.stemProjects.filter((p) => p.category === filterCat);
   if (filtered.length === 0) {
-    listEl.innerHTML = `<div class="p-5 bg-void border border-[rgba(226,232,240,0.14)] rounded-2xl text-xs text-slateMuted">Chưa có dự án nào được đăng. Hãy là người đầu tiên đăng ký dự án STEM ở khung bên trái!</div>`;
+    listEl.innerHTML = `<div class="p-5 bg-void border border-[rgba(226,232,240,0.14)] rounded-2xl text-xs text-slateMuted">Chưa có dự án nào được đăng. Hãy là người đầu tiên đăng ký dự án STEM ở khung bên trái (+40 XP, +${FUEL_RULES.STEM_PROJECT_REWARD} L)!</div>`;
     return;
   }
   listEl.innerHTML = filtered.map((p) => {
@@ -1999,7 +2189,7 @@ function renderStemProjects() {
           <span class="font-mono-num text-[10px] font-bold px-2.5 py-0.5 bg-cyanRadar/15 border border-cyanRadar/40 text-cyanRadar rounded-full">${Validator.sanitizeText(p.category)}</span>
           <div class="flex items-center gap-3">
             <span class="font-mono-num text-[11px] text-slateMuted">Ngày báo cáo: ${Validator.sanitizeText(p.eventDate)}</span>
-            ${isMyProject ? `<button type="button" onclick="window.deleteStemProject('${p.id}')" class="text-[11px] text-crimsonSignal font-semibold hover:underline">Xóa dự án</button>` : ''}
+            ${isMyProject ? `<button type="button" onclick="window.deleteStemProject('${p.id}')" class="text-[11px] text-crimsonSignal font-semibold hover:underline">Xóa (-40 XP, -${FUEL_RULES.STEM_PROJECT_REWARD} L)</button>` : ''}
           </div>
         </div>
         <h4 class="text-sm font-bold text-white">${Validator.sanitizeText(p.title)}</h4>
@@ -2045,7 +2235,13 @@ window.toggleVoteStemProject = async function (projectId) {
 };
 
 window.deleteStemProject = async function (projectId) {
+  const target = state.stemProjects.find((p) => p.id === projectId);
+  if (!target) return;
   state.stemProjects = state.stemProjects.filter((p) => p.id !== projectId);
+  // Thu hồi XP và nhiên liệu khi xóa dự án của chính mình để chống spam tạo-xóa
+  if (target.authorId === state.userId || target.author === state.userName) {
+    awardRewards(-40, -FUEL_RULES.STEM_PROJECT_REWARD);
+  }
   saveToLocalStorage();
   renderStemProjects();
   if (db && currentUser && fbSdk) {
@@ -2054,11 +2250,11 @@ window.deleteStemProject = async function (projectId) {
       await deleteDoc(doc(db, 'eduniverse_projects', projectId));
     } catch (_) {}
   }
-  showToast('ĐÃ XÓA DỰ ÁN', 'Dự án đã được gỡ khỏi hệ thống.', 'info');
+  showToast('ĐÃ XÓA DỰ ÁN', 'Đã gỡ dự án và thu hồi phần thưởng đăng bài.', 'info');
 };
 
 // =========================================================================
-// 10. GIA SƯ AI SOCRATIC & BẢNG XẾP HẠNG NGƯỜI DÙNG THẬT 100%
+// 11. GIA SƯ AI SOCRATIC & BẢNG XẾP HẠNG NGƯỜI DÙNG THẬT 100%
 // =========================================================================
 async function callSocraticGemini(userMessage) {
   const apiKey = (cloudCfg.geminiKey || '').trim();
@@ -2146,7 +2342,6 @@ function renderDiagnosticsAndLeaderboard() {
     return `<div title="${b.desc}" class="p-2.5 border ${unlocked ? 'border-emeraldLock/50 bg-emeraldLock/15' : 'border-[rgba(226,232,240,0.1)] bg-void/50 opacity-50'} rounded-2xl"><div class="font-mono-num text-[10px] font-bold ${unlocked ? 'text-emeraldLock' : 'text-slateMuted'}">${b.code}</div><div class="text-[11px] font-bold text-white mt-0.5 leading-tight">${b.title}</div></div>`;
   }).join('');
 
-  // Tổng hợp danh sách người chơi THẬT (Từ Firestore hoặc các tài khoản thật trên máy)
   const totalRings = Object.values(state.planetProgress).reduce((acc, v) => acc + Math.max(0, v - 1), 0);
   const mapById = new Map();
 
@@ -2154,7 +2349,6 @@ function renderDiagnosticsAndLeaderboard() {
     mapById.set(u.id, { ...u, isMe: u.id === state.userId || u.name.toLowerCase() === state.userName.toLowerCase() });
   });
 
-  // Đảm bảo tài khoản hiện tại luôn cập nhật tức thời
   mapById.set(state.userId, {
     id: state.userId,
     name: state.userName,
@@ -2164,7 +2358,7 @@ function renderDiagnosticsAndLeaderboard() {
     isMe: true
   });
 
-  const sortedRealUsers = Array.from(mapById.values()).sort((a, b) => (b.xp - a.xp) || (b.rings - a.rings));
+  const sortedRealUsers = Array.from(mapById.values()).sort((a, b) => (b.xp - a.xp) || (b.rings - a.rings) || (b.fuel - a.fuel));
 
   document.getElementById('leaderboard-list').innerHTML = sortedRealUsers.map((row, idx) => `
     <div class="px-4 py-2.5 border ${row.isMe ? 'border-cyanRadar bg-cyanRadar/15 shadow-md' : 'border-[rgba(226,232,240,0.12)] bg-void'} rounded-2xl flex items-center justify-between text-xs">
@@ -2172,7 +2366,7 @@ function renderDiagnosticsAndLeaderboard() {
         <span class="font-mono-num font-extrabold w-6 ${idx === 0 ? 'text-amberSolar' : 'text-slateMuted'}">#${idx + 1}</span>
         <div class="truncate">
           <div class="font-bold text-white truncate">${Validator.sanitizeText(row.name)} ${row.isMe ? '<span class="text-cyanRadar">(Bạn)</span>' : ''}</div>
-          <div class="text-[11px] text-slateMuted">${getAstronautRank(row.xp)} • ${row.rings}/15 vòng</div>
+          <div class="text-[11px] text-slateMuted">${getAstronautRank(row.xp)} • ${row.rings}/15 vòng • ${row.fuel ?? 0} L</div>
         </div>
       </div>
       <span class="font-mono-num font-extrabold text-amberSolar shrink-0 ml-2">${row.xp} XP</span>
@@ -2181,7 +2375,7 @@ function renderDiagnosticsAndLeaderboard() {
 }
 
 // =========================================================================
-// 11. CỬA SỔ CẤU HÌNH HỒ SƠ, ĐỔI TÀI KHOẢN & KẾT NỐI FIREBASE
+// 12. CỬA SỔ CẤU HÌNH HỒ SƠ, ĐỔI TÀI KHOẢN & KHỞI TẠO
 // =========================================================================
 function initCloudSettingsModal() {
   const modal = document.getElementById('cloud-modal');
@@ -2216,7 +2410,7 @@ function initCloudSettingsModal() {
     await initFirebaseConnection();
     await persistUserProfile();
     refreshAllUI();
-    showToast('ĐÃ CẬP NHẬT HỆ THỐNG', `Đang hoạt động với hồ sơ "${state.userName}".`, 'success');
+    showToast('ĐÃ CẬP NHẬT HỆ THỐNG', `Hồ sơ "${state.userName}" (${state.xp} XP | ${state.fuel} L).`, 'success');
   });
 
   document.getElementById('btn-google-login').addEventListener('click', async () => {
