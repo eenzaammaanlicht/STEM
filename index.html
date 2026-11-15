@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EDUNIVERSE — Vũ Trụ Tri Thức STEM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            void: '#0F152B',
+            surface: '#172042',
+            surfaceAlt: '#212D5A',
+            offwhite: '#F8FAFC',
+            slateMuted: '#B4C6E7',
+            amberSolar: '#FBBF24',
+            cyanRadar: '#38BDF8',
+            crimsonSignal: '#FB7185',
+            emeraldLock: '#34D399',
+          },
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+            mono: ['"Plus Jakarta Sans"', '"Be Vietnam Pro"', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg-deep: #0B1026;
+      --bg-indigo: #151E3F;
+      --glass-card: rgba(24, 34, 72, 0.72);
+      --glass-inner: rgba(15, 22, 48, 0.78);
+      --border-soft: rgba(148, 163, 255, 0.2);
+      --border-glow: rgba(56, 189, 248, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: #F8FAFC;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      background-image:
+        radial-gradient(circle at 10% 12%, rgba(99, 102, 241, 0.34) 0%, transparent 42%),
+        radial-gradient(circle at 88% 18%, rgba(14, 165, 233, 0.28) 0%, transparent 40%),
+        radial-gradient(circle at 50% 55%, rgba(168, 85, 247, 0.16) 0%, transparent 50%),
+        radial-gradient(circle at 82% 88%, rgba(245, 158, 11, 0.2) 0%, transparent 42%),
+        linear-gradient(160deg, #0B1026 0%, #131B3A 50%, #1A1640 100%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    /* Mở rộng khung nhìn tràn đều màn hình lớn */
+    .max-w-7xl {
+      max-width: 1660px !important;
+      width: 96% !important;
+    }
+
+    /* Nâng cấp toàn bộ cỡ chữ (cả tĩnh và do JS sinh ra) cho to, rõ và thoáng */
+    .text-\[9px\],
+    .text-\[10px\] {
+      font-size: 0.84rem !important;
+      line-height: 1.35 !important;
+      letter-spacing: 0.02em;
+    }
+
+    .text-\[11px\] {
+      font-size: 0.9rem !important;
+      line-height: 1.45 !important;
+    }
+
+    .text-xs {
+      font-size: 0.98rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .text-sm {
+      font-size: 1.08rem !important;
+      line-height: 1.6 !important;
+    }
+
+    .text-base {
+      font-size: 1.22rem !important;
+      line-height: 1.5 !important;
+    }
+
+    .text-lg {
+      font-size: 1.42rem !important;
+      line-height: 1.4 !important;
+    }
+
+    .text-xl {
+      font-size: 1.7rem !important;
+      line-height: 1.35 !important;
+    }
+
+    /* Bỏ kiểu chữ máy móc, dùng số cân đối hiện đại */
+    .font-mono-num {
+      font-family: 'Plus Jakarta Sans', 'Be Vietnam Pro', sans-serif;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.01em;
+    }
+
+    /* Thẻ kính mờ (Glassmorphism) tự nhiên, bo tròn mềm mại */
+    .hud-panel {
+      background: linear-gradient(145deg, rgba(30, 42, 88, 0.78) 0%, rgba(19, 27, 58, 0.85) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border-soft);
+      border-radius: 22px !important;
+      box-shadow:
+        0 18px 40px -15px rgba(5, 8, 22, 0.65),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .hud-panel-elevated {
+      background: linear-gradient(155deg, #1E2956 0%, #121936 100%);
+      border: 1px solid rgba(148, 163, 255, 0.35);
+      border-radius: 24px !important;
+      box-shadow: 0 28px 70px rgba(4, 6, 18, 0.88);
+    }
+
+    /* Xóa bỏ hoàn toàn các góc vuông kỹ thuật AI */
+    .corner-ticks::before,
+    .corner-ticks::after {
+      display: none !important;
+    }
+
+    /* Làm mềm mọi thẻ con, ô nhập liệu và nút bấm do JS render */
+    .rounded,
+    .rounded-sm,
+    .rounded-md {
+      border-radius: 14px !important;
+    }
+
+    .bg-void,
+    .bg-void\/80,
+    .bg-void\/85,
+    .bg-void\/90 {
+      background-color: var(--glass-inner) !important;
+    }
+
+    .bg-surface {
+      background-color: rgba(30, 43, 88, 0.72) !important;
+    }
+
+    .bg-surfaceAlt {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.22) 0%, rgba(99, 102, 241, 0.26) 100%) !important;
+    }
+
+    /* Nút điều hướng dạng viên thuốc (Pill Tabs) nổi bật */
+    .nav-tab {
+      border-bottom: none !important;
+      border-radius: 999px !important;
+      padding: 0.65rem 1.35rem !important;
+      margin: 0.35rem 0.25rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab.border-cyanRadar {
+      background: linear-gradient(135deg, #38BDF8 0%, #6366F1 100%) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 6px 20px -4px rgba(56, 189, 248, 0.55);
+    }
+
+    .nav-tab:not(.border-cyanRadar):hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #FFFFFF !important;
+    }
+
+    /* Các thẻ chỉ số trên thanh Header đa sắc */
+    .stat-badge-xp {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.1) 100%) !important;
+      border-color: rgba(251, 191, 36, 0.4) !important;
+    }
+
+    .stat-badge-fuel {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.22) 0%, rgba(14, 165, 233, 0.1) 100%) !important;
+      border-color: rgba(56, 189, 248, 0.4) !important;
+    }
+
+    .stat-badge-rank {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.24) 0%, rgba(99, 102, 241, 0.12) 100%) !important;
+      border-color: rgba(168, 85, 247, 0.4) !important;
+    }
+
+    /* Hiệu ứng nút bấm nổi tự nhiên */
+    button {
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1.5px);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .bg-cyanRadar {
+      background: linear-gradient(135deg, #38BDF8 0%, #3B82F6 100%) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 8px 20px -6px rgba(56, 189, 248, 0.6);
+    }
+
+    .bg-amberSolar {
+      background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%) !important;
+      color: #0F172A !important;
+      box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.55);
+    }
+
+    .bg-emeraldLock {
+      background: linear-gradient(135deg, #34D399 0%, #10B981 100%) !important;
+      color: #06281E !important;
+      box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Ô nhập liệu thoáng và rõ */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="url"],
+    input[type="password"],
+    select,
+    textarea {
+      padding: 0.7rem 0.95rem !important;
+      border-radius: 14px !important;
+      border-color: rgba(148, 163, 255, 0.26) !important;
+      background-color: rgba(13, 19, 42, 0.85) !important;
+      color: #F8FAFC !important;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #38BDF8 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+    }
+
+    /* Thanh trượt (Range Slider) hiện đại */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(148, 163, 255, 0.25);
+      height: 8px;
+      border-radius: 999px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(135deg, #38BDF8, #818CF8);
+      border: 3px solid #FFFFFF;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.6);
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+    }
+
+    /* Tương tác hành tinh trên SVG */
+    .planet-node {
+      cursor: pointer;
+    }
+    .planet-node:hover .planet-ring-hover {
+      stroke-opacity: 1;
+      stroke-width: 2.2;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B1026;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 255, 0.3);
+      border-radius: 999px;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.9);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-cyanRadar/30 selection:text-offwhite">
+
+  <!-- HEADER VŨ TRỤ TRI THỨC -->
+  <header class="sticky top-0 z-40 bg-[#0D132B]/85 backdrop-blur-xl border-b border-indigo-400/20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 via-indigo-500 to-purple-600 p-[2px] shadow-lg shadow-indigo-500/30">
+            <div class="w-full h-full bg-[#0F1631] rounded-[14px] flex items-center justify-center">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="1.8">
+                <circle cx="12" cy="12" r="3.5" fill="#FBBF24" stroke="none"></circle>
+                <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-24 12 12)"></ellipse>
+                <circle cx="19.5" cy="8.5" r="1.8" fill="#F8FAFC" stroke="none"></circle>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2.5">
+              <span class="font-extrabold tracking-tight text-xl sm:text-2xl bg-gradient-to-r from-white via-sky-200 to-indigo-200 bg-clip-text text-transparent">
+                EDUNIVERSE
+              </span>
+              <span class="text-[11px] font-semibold px-2.5 py-0.5 border border-sky-400/40 text-sky-300 bg-sky-500/15 rounded-full">
+                Vũ Trụ Tri Thức
+              </span>
+            </div>
+            <p class="text-xs text-slateMuted">Khám phá tri thức – Chinh phục tương lai</p>
+          </div>
+        </div>
+        <button id="btn-open-cloud-mobile" type="button" class="lg:hidden font-semibold text-xs px-3.5 py-2 border border-sky-400/50 text-sky-300 bg-surface rounded-xl">
+          Hồ sơ & Cloud
+        </button>
+      </div>
+
+      <!-- 3 Thẻ chỉ số đa sắc nổi bật -->
+      <div class="grid grid-cols-3 sm:flex sm:items-center gap-3 sm:gap-4">
+        <div class="hud-panel stat-badge-xp px-4 py-2 flex flex-col">
+          <span class="text-[10px] text-amber-200/80 font-medium">Điểm tích lũy</span>
+          <span id="hud-xp" class="font-mono-num font-extrabold text-amberSolar text-base">80 XP</span>
+        </div>
+        <div class="hud-panel stat-badge-fuel px-4 py-2 flex flex-col">
+          <span class="text-[10px] text-sky-200/80 font-medium">Nhiên liệu bay</span>
+          <span id="hud-fuel" class="font-mono-num font-extrabold text-cyanRadar text-base">60 L</span>
+        </div>
+        <div class="hud-panel stat-badge-rank px-4 py-2 flex flex-col">
+          <span class="text-[10px] text-purple-200/80 font-medium">Danh hiệu</span>
+          <span id="hud-rank" class="font-bold text-white truncate text-sm">Tập sự quỹ đạo</span>
+        </div>
+
+        <div class="hidden lg:flex items-center gap-3 pl-4 border-l border-indigo-300/20">
+          <div class="flex items-center gap-2.5">
+            <span class="w-3 h-3 rounded-full bg-amberSolar shadow-[0_0_10px_#FBBF24]" id="sync-dot"></span>
+            
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- Thanh điều hướng dạng viên thuốc (Pill Navigation) -->
+    <nav class="border-t border-indigo-400/15 bg-[#0B1024]/70">
+      <div class="max-w-7xl mx-auto px-4 sm:px-8 py-1.5 flex gap-2 overflow-x-auto">
+        <button data-tab="map" class="nav-tab text-sm border-b-2 border-cyanRadar text-offwhite font-semibold whitespace-nowrap">
+          🪐 Bản Đồ Vũ Trụ & Học Liệu
+        </button>
+        <button data-tab="arena" class="nav-tab text-sm border-b-2 border-transparent text-slateMuted hover:text-offwhite whitespace-nowrap">
+          ⚡ Thử Thách 5 Phút & Đấu Trường
+        </button>
+        <button data-tab="lab" class="nav-tab text-sm border-b-2 border-transparent text-slateMuted hover:text-offwhite whitespace-nowrap">
+          🔬 Phòng Thí Nghiệm & Dự Án STEM
+        </button>
+        <button data-tab="advisor" class="nav-tab text-sm border-b-2 border-transparent text-slateMuted hover:text-offwhite whitespace-nowrap">
+          🤖 Gia Sư AI & Bảng Xếp Hạng
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-md w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- KHÔNG GIAN CHÍNH TRÀN MÀN HÌNH -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-7">
+
+    <!-- KHU VỰC 1: HỆ MẶT TRỜI XOAY SVG + CỘT KHÓA MỤC TIÊU CỐ ĐỊNH BÊN CẠNH -->
+    <section id="module-map" class="module-section space-y-7">
+      <div class="hud-panel p-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="text-xs font-bold px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">
+              Khám phá theo hành tinh
+            </span>
+            <span class="font-mono-num text-xs font-bold text-amberSolar" id="map-overall-progress">Tiến độ: 0/15 vòng quỹ đạo</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-white mt-2">
+            Hệ Mặt Trời Tri Thức — Lộ Trình 3 Vòng Từ Ngoài Vào Lõi
+          </h1>
+          <p class="text-xs sm:text-sm text-slateMuted mt-1">
+            Bấm chọn môn học ở <strong>bảng danh sách cố định bên phải bản đồ</strong> (hoặc bấm trực tiếp vào hành tinh). Đạt từ 70% điểm trở lên để mở khóa vòng trong.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 bg-[#0D142E]/80 p-2 rounded-2xl border border-indigo-400/20">
+          <span class="text-xs text-slateMuted px-2 font-medium">Tốc độ quỹ đạo:</span>
+          <button data-speed="0" type="button" class="speed-btn font-mono-num text-xs px-3 py-1.5 border border-[rgba(226,232,240,0.18)] bg-void text-slateMuted rounded">Dừng</button>
+          <button data-speed="0.5" type="button" class="speed-btn font-mono-num text-xs px-3 py-1.5 border border-[rgba(226,232,240,0.18)] bg-void text-slateMuted rounded">0.5x</button>
+          <button data-speed="1" type="button" class="speed-btn font-mono-num text-xs px-3 py-1.5 border border-cyanRadar bg-cyanRadar/15 text-cyanRadar font-bold rounded">1x</button>
+          <button data-speed="2" type="button" class="speed-btn font-mono-num text-xs px-3 py-1.5 border border-[rgba(226,232,240,0.18)] bg-void text-slateMuted rounded">2x</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-7 items-start">
+        <!-- Cột trái (7 cột): Khung SVG Hệ Mặt Trời xoay + Cột Chọn Nhanh Cố Định -->
+        <div class="xl:col-span-7 hud-panel p-6">
+          <div class="flex items-center justify-between text-xs text-slateMuted mb-4 pb-3 border-b border-indigo-300/15">
+            <span class="font-semibold text-white">Bản Đồ Quỹ Đạo Tương Tác</span>
+            <span id="selected-planet-coords" class="text-cyanRadar font-bold">MỤC TIÊU: SAO HỎA — TOÁN HỌC</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <!-- Bản đồ SVG xoay (7/12 cột) -->
+            <div class="md:col-span-7 w-full aspect-square max-h-[500px] mx-auto relative flex items-center justify-center bg-gradient-to-b from-[#090D20] to-[#11193A] border border-indigo-400/25 rounded-3xl overflow-hidden shadow-inner">
+              <svg id="solar-system-svg" viewBox="0 0 600 600" class="w-full h-full select-none">
+                <defs>
+                  <radialGradient id="nebulaCenter" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#6366F1" stop-opacity="0.22" />
+                    <stop offset="55%" stop-color="#0EA5E9" stop-opacity="0.08" />
+                    <stop offset="100%" stop-color="#090D20" stop-opacity="0" />
+                  </radialGradient>
+                  <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.65" />
+                    <stop offset="60%" stop-color="#F59E0B" stop-opacity="0.18" />
+                    <stop offset="100%" stop-color="#F59E0B" stop-opacity="0" />
+                  </radialGradient>
+                </defs>
+                <rect width="600" height="600" fill="url(#nebulaCenter)" />
+                <circle cx="300" cy="300" r="181" fill="none" stroke="rgba(148,163,255,0.22)" stroke-width="3" stroke-dasharray="2 9" />
+                <g id="orbit-rings-layer"></g>
+                <line id="target-laser-line" x1="300" y1="300" x2="300" y2="300" stroke="#38BDF8" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.75" />
+                <g id="sun-core-node" class="cursor-pointer" onclick="window.switchModule('lab')">
+                  <circle cx="300" cy="300" r="54" fill="url(#sunGlow)" />
+                  <circle cx="300" cy="300" r="32" fill="none" stroke="#FBBF24" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.85" />
+                  <circle cx="300" cy="300" r="21" fill="#F59E0B" fill-opacity="0.3" stroke="#FBBF24" stroke-width="1.8" />
+                  <circle cx="300" cy="300" r="10" fill="#FDE047" />
+                  <text x="300" y="348" text-anchor="middle" fill="#FDE047" font-family="Be Vietnam Pro" font-size="10" font-weight="700">PHÒNG LAB STEM</text>
+                </g>
+                <g id="planets-layer"></g>
+              </svg>
+            </div>
+
+            <!-- Cột Chọn Nhanh Hành Tinh Cố Định Bên Cạnh (5/12 cột) -->
+            <div class="md:col-span-5 flex flex-col justify-between space-y-3">
+              <div class="flex items-center justify-between text-xs font-bold text-sky-300 pb-1.5 border-b border-indigo-300/20">
+                <span>DANH SÁCH 5 HÀNH TINH</span>
+                <span class="text-slateMuted font-normal">Bấm để chọn</span>
+              </div>
+              <div id="planet-quick-cards" class="space-y-2.5"></div>
+              <div class="p-3.5 bg-indigo-950/60 border border-indigo-400/25 rounded-2xl text-xs text-slateMuted leading-relaxed">
+                💡 Danh sách này luôn đứng yên để bạn chuyển nhanh giữa các môn học mà không cần rê chuột đuổi theo quỹ đạo.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cột phải (5 cột): Trạm nhiệm vụ 3 vòng quỹ đạo -->
+        <div class="xl:col-span-5 hud-panel p-6 space-y-5">
+          <div id="planet-inspector-header" class="border-b border-indigo-300/20 pb-4"></div>
+          <div class="grid grid-cols-3 bg-[#0C1229] border border-indigo-400/25 rounded-2xl p-1.5 gap-1.5">
+            <button data-subtab="climb" type="button" class="inspector-subtab text-xs py-2.5 px-3 bg-surfaceAlt text-cyanRadar border border-cyanRadar/40 rounded-xl font-bold">Lộ trình 3 vòng</button>
+            <button data-subtab="theory" type="button" class="inspector-subtab text-xs py-2.5 px-3 text-slateMuted hover:text-offwhite rounded-xl font-medium">Góc kiến thức</button>
+            <button data-subtab="library" type="button" class="inspector-subtab text-xs py-2.5 px-3 text-slateMuted hover:text-offwhite rounded-xl font-medium">Thư viện số</button>
+          </div>
+          <div id="planet-inspector-body" class="min-h-[410px]"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KHU VỰC 2: HỘP THƯ BÍ MẬT, THỬ THÁCH 5 PHÚT & ĐẤU TRƯỜNG -->
+    <section id="module-arena" class="module-section hidden space-y-7">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-7">
+        <div class="lg:col-span-5 hud-panel p-6 flex flex-col justify-between space-y-5">
+          <div>
+            <div class="flex items-center justify-between border-b border-indigo-300/20 pb-3.5">
+              <div>
+                <span class="text-xs text-amberSolar font-bold">🎁 Khám phá mỗi ngày</span>
+                <h2 class="text-lg font-extrabold text-white mt-0.5">Hộp Thư Kiến Thức Bí Mật</h2>
+              </div>
+              <span id="mystery-date-tag" class="font-mono-num text-xs px-3 py-1 bg-void border border-indigo-400/25 text-slateMuted rounded-full"></span>
+            </div>
+            <p class="text-xs text-slateMuted mt-3.5 leading-relaxed">
+              Giải câu đố tư duy để mở hộp thư hôm nay: nhận sự thật khoa học thú vị, câu nói truyền cảm hứng và <span class="text-white font-semibold">phiếu nhắc kiến thức</span> theo đúng chủ đề bạn từng làm sai.
+            </p>
+          </div>
+          <div id="mystery-box-content" class="my-2"></div>
+        </div>
+
+        <div class="lg:col-span-7 hud-panel p-6 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-300/20 pb-3.5">
+            <div>
+              <span class="text-xs text-cyanRadar font-bold">⏱️ Rèn phản xạ liên môn</span>
+              <h2 class="text-lg font-extrabold text-white mt-0.5">Thử Thách 5 Phút Mỗi Ngày</h2>
+            </div>
+            <div class="px-4 py-2 bg-void border border-amber-400/35 rounded-2xl text-right">
+              <span class="block text-[10px] text-slateMuted">Thời gian còn lại</span>
+              <span id="daily-timer-display" class="font-mono-num text-lg font-extrabold text-amberSolar">05:00</span>
+            </div>
+          </div>
+          <div id="daily-challenge-container"></div>
+        </div>
+      </div>
+
+      <div class="hud-panel p-6 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-300/20 pb-3.5">
+          <div>
+            <span class="text-xs text-emeraldLock font-bold">🏆 Thi đấu tốc độ (15 giây / câu)</span>
+            <h2 class="text-lg font-extrabold text-white mt-0.5">Đấu Trường Trí Tuệ Liên Hành Tinh</h2>
+            <p class="text-xs text-slateMuted">10 câu hỏi trộn ngẫu nhiên từ 5 hành tinh. Trả lời đúng liên tiếp từ 3 câu trở lên nhận điểm thưởng chuỗi XP.</p>
+          </div>
+          <span class="font-mono-num text-xs px-4 py-2 bg-void border border-indigo-400/25 text-white rounded-2xl">
+            Kỷ lục cá nhân: <strong id="arena-best-score" class="text-amberSolar">0/10</strong>
+          </span>
+        </div>
+        <div id="arena-workspace"></div>
+      </div>
+    </section>
+
+    <!-- KHU VỰC 3: PHÒNG THÍ NGHIỆM 3 MÔ PHỎNG & ĐĂNG KÝ DỰ ÁN STEM -->
+    <section id="module-lab" class="module-section hidden space-y-7">
+      <div class="hud-panel p-6 space-y-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-indigo-300/20 pb-4">
+          <div>
+            <span class="text-xs text-cyanRadar font-bold">🔭 Mô phỏng tương tác thời gian thực</span>
+            <h2 class="text-lg font-extrabold text-white mt-0.5" id="lab-sim-heading">Mô Phỏng 1: Chuyển Động Ném Xiên Đa Hành Tinh</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button data-sim-mode="projectile" type="button" class="sim-mode-tab font-mono-num text-xs px-4 py-2 border border-cyanRadar bg-cyanRadar/15 text-cyanRadar font-semibold rounded">1. Ném xiên</button>
+            <button data-sim-mode="pendulum" type="button" class="sim-mode-tab font-mono-num text-xs px-4 py-2 border border-[rgba(226,232,240,0.18)] bg-void text-slateMuted hover:text-offwhite rounded">2. Con lắc đơn</button>
+            <button data-sim-mode="titration" type="button" class="sim-mode-tab font-mono-num text-xs px-4 py-2 border border-[rgba(226,232,240,0.18)] bg-void text-slateMuted hover:text-offwhite rounded">3. Chuẩn độ pH</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 space-y-4 bg-void/80 border border-indigo-400/20 p-5 rounded-2xl">
+            <!-- Điều khiển Ném xiên -->
+            <div id="sim-controls-projectile" class="space-y-4">
+              <div class="flex flex-wrap gap-2 pb-3 border-b border-indigo-300/15">
+                <button data-gravity="9.81" data-planet-name="Trái Đất" type="button" class="gravity-preset-btn font-mono-num text-[11px] px-2.5 py-1.5 border border-cyanRadar bg-cyanRadar/15 text-cyanRadar rounded">Trái Đất (9.81)</button>
+                <button data-gravity="3.72" data-planet-name="Sao Hỏa" type="button" class="gravity-preset-btn font-mono-num text-[11px] px-2.5 py-1.5 border border-[rgba(226,232,240,0.18)] bg-surface text-slateMuted rounded">Sao Hỏa (3.72)</button>
+                <button data-gravity="1.62" data-planet-name="Mặt Trăng" type="button" class="gravity-preset-btn font-mono-num text-[11px] px-2.5 py-1.5 border border-[rgba(226,232,240,0.18)] bg-surface text-slateMuted rounded">Mặt Trăng (1.62)</button>
+                <button data-gravity="24.79" data-planet-name="Sao Mộc" type="button" class="gravity-preset-btn font-mono-num text-[11px] px-2.5 py-1.5 border border-[rgba(226,232,240,0.18)] bg-surface text-slateMuted rounded">Sao Mộc (24.79)</button>
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center text-xs">
+                  <label for="sim-angle-num" class="text-white font-semibold">Góc bắn θ (5° – 85°)</label>
+                  <input id="sim-angle-num" type="number" min="5" max="85" step="1" value="45" class="w-20 font-mono-num text-xs text-right bg-surface border px-2 py-1 text-cyanRadar rounded" />
+                </div>
+                <input id="sim-angle-range" type="range" min="5" max="85" step="1" value="45" class="w-full" />
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center text-xs">
+                  <label for="sim-vel-num" class="text-white font-semibold">Vận tốc v₀ (5 – 100 m/s)</label>
+                  <input id="sim-vel-num" type="number" min="5" max="100" step="1" value="42" class="w-20 font-mono-num text-xs text-right bg-surface border px-2 py-1 text-amberSolar rounded" />
+                </div>
+                <input id="sim-vel-range" type="range" min="5" max="100" step="1" value="42" class="w-full" />
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <label for="sim-grav-num" class="text-white font-semibold">Gia tốc g (1.62 – 24.79)</label>
+                <input id="sim-grav-num" type="number" min="1.62" max="24.79" step="0.01" value="9.81" class="w-24 font-mono-num text-xs text-right bg-surface border px-2 py-1 text-emeraldLock rounded" />
+              </div>
+              <div class="grid grid-cols-2 gap-2.5 pt-2">
+                <button id="sim-launch-btn" type="button" class="font-mono-num text-xs py-2.5 px-3 bg-cyanRadar text-void font-bold rounded">Phóng vật thể</button>
+                <button id="sim-pause-btn" type="button" class="font-mono-num text-xs py-2.5 px-3 border border-indigo-300/30 text-white rounded">Tạm dừng</button>
+                <button id="sim-ghost-btn" type="button" class="col-span-2 font-mono-num text-xs py-2.5 px-3 border border-amberSolar/50 text-amberSolar bg-amberSolar/15 font-semibold rounded">Lưu quỹ đạo so sánh (Ghost)</button>
+              </div>
+            </div>
+
+            <!-- Điều khiển Con lắc đơn -->
+            <div id="sim-controls-pendulum" class="hidden space-y-4">
+              <div class="space-y-1.5">
+                <div class="flex justify-between text-xs"><label class="text-white font-semibold">Chiều dài dây l (0.4 – 4.0 m)</label><span id="pend-len-label" class="font-mono-num text-cyanRadar font-bold">1.6 m</span></div>
+                <input id="pend-len-range" type="range" min="0.4" max="4.0" step="0.1" value="1.6" class="w-full" />
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex justify-between text-xs"><label class="text-white font-semibold">Biên độ góc α₀ (5° – 45°)</label><span id="pend-amp-label" class="font-mono-num text-amberSolar font-bold">24°</span></div>
+                <input id="pend-amp-range" type="range" min="5" max="45" step="1" value="24" class="w-full" />
+              </div>
+              <p class="text-xs text-slateMuted leading-relaxed">Quan sát sự phụ thuộc của chu kỳ dao động vào chiều dài dây và đường sóng dao động điều hòa vẽ trực tiếp bên phải.</p>
+            </div>
+
+            <!-- Điều khiển Chuẩn độ pH -->
+            <div id="sim-controls-titration" class="hidden space-y-4">
+              <div class="space-y-1.5">
+                <div class="flex justify-between text-xs"><label class="text-white font-semibold">Thể tích NaOH 0.1M (0 – 50 ml)</label><span id="tit-vol-label" class="font-mono-num text-cyanRadar font-bold">15.0 ml</span></div>
+                <input id="tit-vol-range" type="range" min="0" max="50" step="0.5" value="15" class="w-full" />
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button id="tit-add-drop" type="button" class="font-mono-num text-xs py-2.5 bg-cyanRadar text-void font-bold rounded">+ Nhỏ 0.5 ml</button>
+                <button id="tit-reset-btn" type="button" class="font-mono-num text-xs py-2.5 border border-indigo-300/30 text-white rounded">Đặt lại 0 ml</button>
+              </div>
+              <p class="text-xs text-slateMuted leading-relaxed">Chuẩn độ 25.0 ml HCl 0.1M bằng NaOH 0.1M có mặt Phenolphthalein. Tại đúng 25.0 ml đạt pH = 7.00; khi dư kiềm dung dịch chuyển hồng.</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2.5 pt-3 border-t border-indigo-300/15">
+              <div class="bg-surface p-2.5 border border-indigo-300/20 rounded-xl">
+                <span id="sim-lbl-1" class="block font-mono-num text-[10px] text-slateMuted">ĐỘ CAO H_max</span>
+                <span id="sim-out-hmax" class="font-mono-num text-xs font-bold text-white">44.95 m</span>
+              </div>
+              <div class="bg-surface p-2.5 border border-indigo-300/20 rounded-xl">
+                <span id="sim-lbl-2" class="block font-mono-num text-[10px] text-slateMuted">TẦM XA R</span>
+                <span id="sim-out-range" class="font-mono-num text-xs font-bold text-cyanRadar">179.82 m</span>
+              </div>
+              <div class="bg-surface p-2.5 border border-indigo-300/20 rounded-xl">
+                <span id="sim-lbl-3" class="block font-mono-num text-[10px] text-slateMuted">THỜI GIAN T</span>
+                <span id="sim-out-time" class="font-mono-num text-xs font-bold text-amberSolar">6.05 s</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 flex flex-col">
+            <div id="sim-canvas-wrapper" class="w-full h-[360px] sm:h-[420px] bg-[#090E22] border border-indigo-400/25 rounded-2xl relative overflow-hidden shadow-inner">
+              <canvas id="physics-canvas" class="block w-full h-full"></canvas>
+              <div class="absolute top-3 left-3.5 font-mono-num text-[11px] text-slateMuted bg-void/90 px-3 py-1.5 border border-indigo-300/20 rounded-xl">
+                Trạng thái: <span id="sim-env-label" class="text-white font-semibold">Trái Đất (g = 9.81 m/s²)</span>
+              </div>
+              <div class="absolute top-3 right-3.5 font-mono-num text-[11px] text-cyanRadar bg-void/90 px-3 py-1.5 border border-indigo-300/20 rounded-xl" id="sim-live-coords">
+                t = 0.00s | x = 0.0m | y = 0.0m
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slateMuted mt-3">
+              <span>🔹 Nét liền xanh: Quỹ đạo / Đồ thị hiện tại</span>
+              <span class="text-amberSolar">🔸 Nét đứt vàng: Quỹ đạo đối chiếu (Ghost) / Điểm tương đương</span>
+              <span class="text-emeraldLock">🟢 Mũi tên xanh lá: Vector vận tốc tức thời v(t)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bảng Đăng Ký Dự Án STEM -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+        <div class="lg:col-span-5 hud-panel p-6 space-y-5">
+          <div class="border-b border-indigo-300/20 pb-3.5">
+            <span class="text-xs text-amberSolar font-bold">🚀 Gửi ý tưởng sáng tạo</span>
+            <h3 class="text-lg font-extrabold text-white mt-0.5">Đăng Ký Dự Án & Sự Kiện STEM</h3>
+            <p class="text-xs text-slateMuted mt-1">Kiểm tra hợp lệ tự động: chặn số thành viên lẻ/nhỏ hơn 2, chặn kinh phí âm, khóa ngày quá khứ và chống trùng tên.</p>
+          </div>
+
+          <form id="stem-project-form" novalidate class="space-y-4">
+            <div>
+              <label for="proj-title" class="block text-xs font-semibold text-white mb-1.5">Tên dự án / sự kiện <span class="text-crimsonSignal">*</span></label>
+              <input id="proj-title" type="text" maxlength="100" placeholder="VD: Hệ thống tưới tiêu cảm biến độ ẩm IoT" class="w-full text-xs" />
+              <p id="err-proj-title" class="text-[11px] text-crimsonSignal mt-1 hidden"></p>
+            </div>
+            <div>
+              <label for="proj-category" class="block text-xs font-semibold text-white mb-1.5">Lĩnh vực chuyên môn <span class="text-crimsonSignal">*</span></label>
+              <select id="proj-category" class="w-full text-xs">
+                <option value="Vật lý & Kỹ thuật">Vật lý & Kỹ thuật</option>
+                <option value="Tin học & AI">Tin học & AI</option>
+                <option value="Hóa - Sinh - Môi trường">Hóa - Sinh - Môi trường</option>
+                <option value="Toán ứng dụng">Toán ứng dụng</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="proj-members" class="block text-xs font-semibold text-white mb-1.5">Số thành viên (2–10) <span class="text-crimsonSignal">*</span></label>
+                <input id="proj-members" type="number" min="2" max="10" step="1" value="3" placeholder="Số nguyên 2–10" class="w-full font-mono-num text-xs" />
+                <p id="err-proj-members" class="text-[11px] text-crimsonSignal mt-1 hidden"></p>
+              </div>
+              <div>
+                <label for="proj-budget" class="block text-xs font-semibold text-white mb-1.5">Kinh phí dự kiến (VNĐ) <span class="text-crimsonSignal">*</span></label>
+                <input id="proj-budget" type="number" min="0" max="500000000" step="1000" value="150000" placeholder=">= 0" class="w-full font-mono-num text-xs" />
+                <p id="err-proj-budget" class="text-[11px] text-crimsonSignal mt-1 hidden"></p>
+              </div>
+            </div>
+            <div>
+              <label for="proj-date" class="block text-xs font-semibold text-white mb-1.5">Ngày tổ chức / Báo cáo nghiệm thu <span class="text-crimsonSignal">*</span></label>
+              <input id="proj-date" type="date" class="w-full font-mono-num text-xs" />
+              <p id="err-proj-date" class="text-[11px] text-crimsonSignal mt-1 hidden"></p>
+            </div>
+            <div>
+              <label for="proj-desc" class="block text-xs font-semibold text-white mb-1.5">Mục tiêu & Nguyên lý hoạt động (15–500 ký tự) <span class="text-crimsonSignal">*</span></label>
+              <textarea id="proj-desc" rows="3" maxlength="500" placeholder="Mô tả vấn đề giải quyết, vật liệu sử dụng và kết quả dự kiến..." class="w-full text-xs"></textarea>
+              <p id="err-proj-desc" class="text-[11px] text-crimsonSignal mt-1 hidden"></p>
+            </div>
+            <button type="submit" class="w-full text-xs py-3 px-4 bg-amberSolar font-bold rounded-xl">
+              Xác Nhận Đăng Tải Dự Án (+40 XP)
+            </button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-7 hud-panel p-6 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-300/20 pb-3.5">
+            <div>
+              <span class="text-xs text-emeraldLock font-bold">🌟 Triển lãm ý tưởng khoa học</span>
+              <h3 class="text-lg font-extrabold text-white mt-0.5">Phòng Sáng Tạo & Dự Án Cộng Đồng</h3>
+            </div>
+            <select id="filter-stem-category" class="text-xs px-3 py-2">
+              <option value="ALL">Tất cả lĩnh vực</option>
+              <option value="Vật lý & Kỹ thuật">Vật lý & Kỹ thuật</option>
+              <option value="Tin học & AI">Tin học & AI</option>
+              <option value="Hóa - Sinh - Môi trường">Hóa - Sinh - Môi trường</option>
+              <option value="Toán ứng dụng">Toán ứng dụng</option>
+            </select>
+          </div>
+          <div id="stem-projects-list" class="space-y-3.5 max-h-[560px] overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KHU VỰC 4: GIA SƯ AI SOCRATIC & BẢNG XẾP HẠNG -->
+    <section id="module-advisor" class="module-section hidden space-y-7">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+        <div class="lg:col-span-7 hud-panel p-6 flex flex-col h-[660px]">
+          <div class="flex items-center justify-between border-b border-indigo-300/20 pb-3.5 shrink-0">
+            <div>
+              <span class="text-xs text-cyanRadar font-bold">💡 Phương pháp gợi mở Socratic</span>
+              <h2 class="text-lg font-extrabold text-white mt-0.5">Trợ Lý Học Tập AI Gợi Mở Tư Duy</h2>
+            </div>
+            <span class="text-[11px] font-semibold px-3 py-1 border border-cyanRadar/40 text-cyanRadar bg-cyanRadar/10 rounded-full">
+              Hướng dẫn từng bước
+            </span>
+          </div>
+          <div class="flex flex-wrap gap-2 py-3 border-b border-indigo-300/15 shrink-0">
+            <button data-ai-prompt="Phân tích các lỗ hổng kiến thức hiện tại của tôi và đặt 1 câu hỏi kiểm tra." type="button" class="ai-chip text-[11px] px-3 py-1.5 bg-void border border-indigo-300/25 hover:border-cyanRadar text-offwhite rounded-full">Chẩn đoán lỗ hổng kiến thức</button>
+            <button data-ai-prompt="Hướng dẫn tôi phương pháp tìm cực trị của hàm số bậc hai mà không giải hộ đáp án." type="button" class="ai-chip text-[11px] px-3 py-1.5 bg-void border border-indigo-300/25 hover:border-cyanRadar text-offwhite rounded-full">Gợi ý cực trị hàm bậc hai</button>
+            <button data-ai-prompt="Cho tôi 1 bài tập vận dụng ngắn về định luật bảo toàn cơ năng để tự giải." type="button" class="ai-chip text-[11px] px-3 py-1.5 bg-void border border-indigo-300/25 hover:border-cyanRadar text-offwhite rounded-full">Luyện tập bảo toàn cơ năng</button>
+          </div>
+          <div id="ai-chat-stream" class="flex-1 overflow-y-auto py-4 space-y-3.5 pr-1 text-xs sm:text-sm"></div>
+          <form id="ai-chat-form" class="pt-3.5 border-t border-indigo-300/20 flex gap-2.5 shrink-0">
+            <input id="ai-chat-input" type="text" maxlength="400" placeholder="Nhập bài toán, khái niệm chưa rõ hoặc câu trả lời của bạn..." class="flex-1 text-xs" />
+            <button id="ai-send-btn" type="submit" class="text-xs px-5 py-2.5 bg-cyanRadar font-bold rounded-xl shrink-0">Gửi câu hỏi</button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-5 space-y-6">
+          <div class="hud-panel p-6 space-y-4">
+            <div class="border-b border-indigo-300/20 pb-3">
+              <span class="text-xs text-amberSolar font-bold">📊 Hồ sơ năng lực cá nhân</span>
+              <h3 class="text-lg font-extrabold text-white mt-0.5">Phân Tích Tiến Độ & Điểm Yếu</h3>
+            </div>
+            <div id="mastery-bars-container" class="space-y-3"></div>
+            <div class="pt-3.5 border-t border-indigo-300/15">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs text-crimsonSignal font-bold">Chủ đề cần củng cố thêm</span>
+                <span id="weak-topics-count" class="font-mono-num text-xs text-slateMuted">0 mục</span>
+              </div>
+              <div id="weak-topics-list" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div class="pt-3.5 border-t border-indigo-300/15">
+              <span class="block text-xs text-emeraldLock font-bold mb-2.5">Huy hiệu chinh phục</span>
+              <div id="badges-grid" class="grid grid-cols-3 gap-2.5"></div>
+            </div>
+          </div>
+
+          <div class="hud-panel p-6 space-y-3.5">
+            <div class="flex items-center justify-between border-b border-indigo-300/20 pb-3">
+              <div>
+                <span class="text-xs text-cyanRadar font-bold">🏅 Bảng vàng phi hành gia</span>
+                <h3 class="text-lg font-extrabold text-white mt-0.5">Bảng Xếp Hạng Thi Đua</h3>
+              </div>
+              <span class="text-[11px] text-slateMuted">Đồng bộ tức thời</span>
+            </div>
+            <div id="leaderboard-list" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL KIỂM TRA QUỸ ĐẠO -->
+  <div id="quiz-modal" class="fixed inset-0 z-50 hidden bg-[#060919]/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="hud-panel-elevated max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="px-6 py-4 border-b border-indigo-300/20 flex items-center justify-between">
+        <div>
+          <span id="quiz-modal-tag" class="font-mono-num text-xs text-cyanRadar font-bold">TRẠM KIỂM TRA QUỸ ĐẠO</span>
+          <h3 id="quiz-modal-title" class="text-lg font-extrabold text-white">Nhiệm Vụ Mở Khóa</h3>
+        </div>
+        <button id="close-quiz-modal" type="button" class="text-xs px-3.5 py-1.5 border border-indigo-300/30 text-slateMuted hover:text-white rounded-xl">Đóng [ESC]</button>
+      </div>
+      <div id="quiz-modal-body" class="p-6 overflow-y-auto space-y-4 flex-1"></div>
+    </div>
+  </div>
+
+  <!-- MODAL KẾT NỐI FIREBASE AUTH + FIRESTORE THẬT & GEMINI API -->
+  <div id="cloud-modal" class="fixed inset-0 z-50 hidden bg-[#060919]/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="hud-panel-elevated max-w-xl w-full p-6 space-y-5">
+      <div class="flex items-center justify-between border-b border-indigo-300/20 pb-3.5">
+        <div>
+          <span class="text-xs text-cyanRadar font-bold">☁️ Đồng bộ đám mây & Trợ lý AI</span>
+          <h3 class="text-lg font-extrabold text-white">Cấu Hình Hồ Sơ, Firebase & Gemini</h3>
+        </div>
+        <button id="close-cloud-modal" type="button" class="text-xs px-3.5 py-1.5 border border-indigo-300/30 text-slateMuted hover:text-white rounded-xl">Đóng</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label for="cfg-name" class="block font-semibold text-white mb-1.5">Tên hiển thị của bạn trên Bảng xếp hạng</label>
+          <input id="cfg-name" type="text" maxlength="40" class="w-full" />
+        </div>
+        <div>
+          <label for="cfg-gemini" class="block font-semibold text-white mb-1.5">Gemini API Key (Tùy chọn — Để gọi trực tiếp model Gemini)</label>
+          <input id="cfg-gemini" type="password" placeholder="AIzaSy..." class="w-full font-mono-num" />
+        </div>
+        <div>
+          <label for="cfg-firebase" class="block font-semibold text-white mb-1.5">Firebase Config JSON (Lấy từ Project Settings trên Firebase Console)</label>
+          <textarea id="cfg-firebase" rows="3" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}' class="w-full font-mono-num"></textarea>
+          <p class="text-[11px] text-slateMuted mt-1.5">
+            Mọi tiến độ luôn được lưu tự động vào trình duyệt (`localStorage`) nên bấm F5 không bao giờ mất dữ liệu. Khi dán thêm Firebase JSON hợp lệ, web sẽ kết nối <strong>Firebase Auth + Cloud Firestore</strong>.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 pt-1">
+          <button id="btn-google-login" type="button" class="text-xs px-4 py-2.5 bg-surfaceAlt border border-cyanRadar/50 text-cyanRadar hover:bg-cyanRadar hover:text-void font-bold rounded-xl">
+            Đăng nhập Google (Firebase Auth)
+          </button>
+          <button id="btn-reset-data" type="button" class="text-xs px-4 py-2.5 border border-crimsonSignal/50 text-crimsonSignal hover:bg-crimsonSignal/10 rounded-xl">
+            Xóa dữ liệu làm lại từ đầu
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-3 border-t border-indigo-300/20">
+        <button id="btn-save-cloud" type="button" class="text-xs px-5 py-2.5 bg-amberSolar font-bold rounded-xl">
+          Lưu & Kết Nối Ngay
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="border-t border-indigo-400/15 bg-[#0A0F24]/80 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slateMuted">
+      <span class="font-semibold text-white">EDUNIVERSE — VŨ TRỤ TRI THỨC STEM</span>
+      <span>Khám phá tri thức • Chinh phục tương lai</span>
+    </div>
+  </footer>
+
+  <!-- Giữ nguyên liên kết với file app.js của bạn -->
+  <script src="./app.js" defer></script>
+</body>
+</html>
